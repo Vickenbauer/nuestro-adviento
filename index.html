@@ -195,6 +195,30 @@ h1 span{font-style:normal;font-weight:600;color:var(--green)}
 .welcome .big{font-family:var(--serif);font-style:italic;font-size:44px;line-height:1.05;color:var(--wine-d);margin:18px 0 10px}
 .welcome p{color:var(--muted);margin:0 auto 22px;max-width:380px}
 .heartline{width:64px;height:64px;margin:0 auto;color:var(--wine)}
+.hint{background:var(--paper);border:1px solid var(--rose);border-radius:14px;padding:12px 14px;font-size:14px;text-align:left;margin:0 0 18px;color:var(--ink)}
+.shr{display:inline-flex;vertical-align:-2px;color:#2F6FDB}
+.mono{font-family:ui-monospace,'SF Mono',Menlo,monospace;letter-spacing:.08em}
+.link{display:block;margin:16px auto 0;color:var(--wine);font-size:14px;text-decoration:underline;text-underline-offset:3px}
+.back{display:inline-flex;align-items:center;gap:4px;color:var(--muted);font-size:14px;margin:0 0 14px -4px}
+.back svg{width:18px;height:18px}
+.welcome .primary,.welcome .secondary{margin-top:10px}
+.bigcode{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:44px;letter-spacing:.18em;color:var(--wine-d);background:var(--paper);border:1px dashed var(--gold);border-radius:16px;padding:14px 0 14px .18em;margin:4px 0 14px}
+.codein{text-transform:uppercase;font-family:ui-monospace,'SF Mono',Menlo,monospace;letter-spacing:.2em;font-size:20px!important}
+.invite{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding:12px 14px;border-radius:14px;background:var(--rose-l);border:1px solid var(--rose)}
+.invite small{color:var(--muted)}
+.pill{flex:none;background:var(--wine);color:#FBF2E6;font-weight:600;font-size:14px;padding:9px 16px;border-radius:99px}
+.sync{display:inline-block;width:7px;height:7px;border-radius:50%;background:#6E9B74;margin-left:6px;vertical-align:1px}
+.sync.off{background:#C9894E}
+.tag{font-weight:500;color:var(--muted);font-size:12px}
+.status{font-size:15px;color:var(--muted);font-style:italic;font-family:var(--serif);padding:6px 0 4px}
+.status.ready{color:var(--green);font-style:normal;font-family:var(--sans);display:flex;gap:6px;align-items:center}
+.answer{white-space:pre-wrap;font-size:16px;line-height:1.5;padding:2px 0 4px}
+.send{width:100%;margin-top:6px;padding:11px;border-radius:12px;background:var(--wine);color:#FBF2E6;font-weight:600}
+.sent{display:flex;align-items:center;gap:6px;color:var(--green);font-size:13px;font-weight:500;margin-top:4px}
+.ping{position:absolute;top:6px;right:6px;width:9px;height:9px;border-radius:50%;background:var(--wine);box-shadow:0 0 0 3px rgba(123,45,59,.2)}
+.pulse{animation:pl 1.2s ease-in-out infinite}
+@keyframes pl{50%{transform:scale(.85);opacity:.6}}
+input:disabled{opacity:.7}
 @media (min-width:500px){.grid{gap:12px}.box .door .n,.box .inside .n{font-size:24px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -210,6 +234,8 @@ h1 span{font-style:normal;font-weight:600;color:var(--green)}
 <div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
 <script>
 /* ---------- contenido ---------- */
 const CATS = {
@@ -312,6 +338,7 @@ const IC = {
  lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5Z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="m12 7.5.9 1.9 2 .2-1.5 1.3.5 2-1.9-1.1-1.9 1.1.5-2-1.5-1.3 2-.2Z" fill="currentColor" stroke="none"/></svg>',
  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>',
+ share:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>',
  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
  l:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg>',
  r:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>',
@@ -323,33 +350,158 @@ const IC = {
 };
 const DOOR_ICONS=['star','heart','gift','spark'];
 
+/* ---------- configuración ---------- */
+const CFG = window.ADVIENTO_CONFIG || {};
+const CONFIGURED = !!(CFG.supabaseUrl && CFG.supabaseAnonKey && window.supabase);
+const sb = CONFIGURED ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, {
+  auth:{persistSession:true, autoRefreshToken:true, storageKey:'adviento-auth'}
+}) : null;
+
 /* ---------- estado ---------- */
-const KEY='nuestro-adviento-v1';
-let canStore=true;
-function defaultYear(){const d=new Date();return d.getMonth()===0&&d.getDate()<15?d.getFullYear()-1:d.getFullYear();}
-function fresh(){return {v:1,year:defaultYear(),names:{a:'',b:''},unlock:'libre',discreto:false,welcomed:false,days:{},capsule:{text:'',sealed:false,sealedAt:null,openedEarly:false}};}
-let S=fresh();
-try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(fresh(),JSON.parse(raw));localStorage.setItem(KEY+'-t','1');localStorage.removeItem(KEY+'-t');}catch(e){canStore=false;}
-let saveT;
-function save(quiet){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(S));if(!quiet)flashSaved();}catch(e){canStore=false;}},350);}
-function D(n){return S.days[n]||(S.days[n]={opened:false,done:false,mode:null,notes:{shared:'',a:'',b:''},hide:{a:false,b:false},custom:null,swapIdx:0});}
-function content(n){const base=DAYS[n-1];const c=D(n).custom;return c?{...base,...c}:base;}
-function modeOf(n){return D(n).mode||DAYS[n-1].m;}
-const nameA=()=>S.names.a.trim()||'Persona 1';
-const nameB=()=>S.names.b.trim()||'Persona 2';
 const MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const DOW=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+let P = ls.get('adviento-prefs',{discreto:false});
+const savePrefs=()=>ls.set('adviento-prefs',P);
+let S = null;            // estado compartido de la pareja (cache del servidor)
+let view = 'loading';    // loading | setup | welcome | create | join | recover | created | home
+let created = null;      // datos tras crear/unirse (código, clave)
+const swapIdx = {};
+const dirty = new Set(); // campos con cambios locales aún no guardados
+const pending = new Map(); // key -> función de guardado
+
+function emptyState(){return {coupleId:null,code:'',me:'a',year:new Date().getFullYear(),unlock:'libre',names:{a:'',b:''},joined:{a:false,b:false},days:{},answers:{},status:{},capsule:{text:'',sealed:false,sealedAt:null,openedEarly:false}};}
+function D(n){return S.days[n]||(S.days[n]={opened:false,done:false,mode:null,custom:null,shared_note:''});}
+function A(n,slot){const a=S.answers[n]||(S.answers[n]={});return a[slot]||(a[slot]={body:'',submitted:false});}
+function submitted(n,slot){return !!(S.status[n]&&S.status[n][slot]);}
+function content(n){const base=DAYS[n-1];const c=D(n).custom;return c?{...base,...c}:base;}
+function modeOf(n){return D(n).mode||DAYS[n-1].m;}
+const other=()=>S.me==='a'?'b':'a';
+const nm=s=>S.names[s]?.trim()||(s===S.me?'Tú':'Tu pareja');
+const myName=()=>nm(S.me), partnerName=()=>nm(other());
+const pn=()=>S.names[other()]?.trim()||'tu pareja';
+const partnerJoined=()=>S.joined[other()];
 function dateOf(n){return new Date(S.year,11,n);}
 function isUnlocked(n){return S.unlock==='libre'||D(n).opened||new Date()>=dateOf(n);}
 function isToday(n){const t=new Date();return t.getFullYear()===S.year&&t.getMonth()===11&&t.getDate()===n;}
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function counts(){let o=0,d=0;for(let n=1;n<=31;n++){if(S.days[n]?.opened)o++;if(S.days[n]?.done)d++;}return {o,d};}
+const cacheState=()=>{if(S&&S.coupleId)ls.set('adviento-cache',S);};
+const inviteLink=()=>`${location.origin}/?c=${S.code}`;
+const isStandalone=()=>window.navigator.standalone===true||matchMedia('(display-mode: standalone)').matches;
+const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const ERR={ALREADY_MEMBER:'Este móvil ya está en un calendario.',CODE_NOT_FOUND:'No encontramos ese código. Revísalo.',COUPLE_FULL:'Ese calendario ya tiene a sus dos personas.',RECOVERY_INVALID:'El código o la clave de recuperación no coinciden.',NOT_AUTHENTICATED:'No se pudo iniciar sesión. Inténtalo de nuevo.'};
+function errMsg(e){const m=(e&&(e.message||e.error_description))||'';for(const k in ERR)if(m.includes(k))return ERR[k];if(/anonymous/i.test(m))return 'Falta activar el acceso anónimo en Supabase (Authentication → Sign In / Providers).';if(/fetch|network/i.test(m))return 'Sin conexión. Inténtalo de nuevo.';return m||'Algo ha fallado.';}
+
+/* ---------- servidor ---------- */
+async function ensureSession(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(session)return session.user;
+  const {data,error}=await sb.auth.signInAnonymously();
+  if(error)throw error;
+  return data.user;
+}
+async function findMembership(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session)return null;
+  const {data,error}=await sb.from('members').select('couple_id,slot').eq('user_id',session.user.id).maybeSingle();
+  if(error)throw error;
+  return data;
+}
+async function loadAll(coupleId,me){
+  const [c,m,d,a,st]=await Promise.all([
+    sb.from('couples').select('*').eq('id',coupleId).single(),
+    sb.from('members').select('slot,name').eq('couple_id',coupleId),
+    sb.from('days').select('*').eq('couple_id',coupleId),
+    sb.from('answers').select('n,slot,body,submitted').eq('couple_id',coupleId),
+    sb.rpc('answer_status',{p_couple:coupleId})
+  ]);
+  for(const r of [c,m,d,a,st])if(r.error)throw r.error;
+  const prev=S;const N=emptyState();
+  N.coupleId=coupleId;N.me=me;N.code=c.data.code;N.year=c.data.year;N.unlock=c.data.unlock;
+  N.capsule={text:c.data.capsule_text,sealed:c.data.capsule_sealed,sealedAt:c.data.capsule_sealed_at,openedEarly:c.data.capsule_opened_early};
+  for(const r of m.data){N.names[r.slot]=r.name;N.joined[r.slot]=true;}
+  for(const r of d.data)N.days[r.n]={opened:r.opened,done:r.done,mode:r.mode,custom:r.custom,shared_note:r.shared_note};
+  for(const r of a.data){(N.answers[r.n]||(N.answers[r.n]={}))[r.slot]={body:r.body,submitted:r.submitted};}
+  for(const r of st.data){(N.status[r.n]||(N.status[r.n]={}))[r.slot]=r.submitted;}
+  // conservar lo que el usuario está escribiendo y aún no se ha guardado
+  if(prev&&prev.coupleId===coupleId){
+    for(const k of dirty){
+      const [t,x]=k.split(':');const n=+x;
+      if(t==='note')N.days[n]=Object.assign(N.days[n]||{opened:true,done:false,mode:null,custom:null},{shared_note:prev.days[n]?.shared_note??''});
+      if(t==='ans'){(N.answers[n]||(N.answers[n]={}))[me]=Object.assign({submitted:false},N.answers[n]?.[me],{body:prev.answers[n]?.[me]?.body??''});}
+      if(t==='capsule')N.capsule.text=prev.capsule.text;
+      if(t==='name')N.names[me]=prev.names[me];
+    }
+  }
+  S=N;cacheState();
+}
+function queue(key,fn,delay=600){
+  dirty.add(key);
+  clearTimeout((pending.get(key)||{}).t);
+  const job={fn,t:setTimeout(()=>runJob(key),delay)};
+  pending.set(key,job);
+}
+async function runJob(key){
+  const job=pending.get(key);if(!job)return;
+  try{await job.fn();pending.delete(key);dirty.delete(key);flashSaved();}
+  catch(e){setSyncState(false);}
+}
+function flushAll(){for(const k of [...pending.keys()]){clearTimeout(pending.get(k).t);runJob(k);}}
+async function write(p){const {error}=await p;if(error)throw error;setSyncState(true);}
+function dayPatch(n,fields,immediate){
+  Object.assign(D(n),fields);
+  const key='day:'+n+':'+Object.keys(fields).join(',');
+  const fn=()=>write(sb.from('days').upsert({couple_id:S.coupleId,n,...fields,updated_at:new Date().toISOString()},{onConflict:'couple_id,n'}));
+  if(immediate){fn().catch(()=>{setSyncState(false);queue(key,fn,4000);});}else queue(key,fn);
+  cacheState();
+}
+function coupleUpdate(fields){
+  return write(sb.from('couples').update(fields).eq('id',S.coupleId)).catch(e=>{setSyncState(false);toast('No se pudo guardar. Revisa la conexión.');});
+}
+let online=true;
+function setSyncState(ok){if(ok===online)return;online=ok;const el=$('#syncDot');if(el)el.classList.toggle('off',!ok);if(!ok)toast('Sin conexión. Guardaremos al volver.');}
+
+/* ---------- tiempo real ---------- */
+let channel=null,refreshT=null;
+function subscribe(){
+  if(channel)sb.removeChannel(channel);
+  const id=S.coupleId;
+  channel=sb.channel('pareja-'+id);
+  for(const t of ['days','answers','members'])channel.on('postgres_changes',{event:'*',schema:'public',table:t,filter:`couple_id=eq.${id}`},scheduleRefresh);
+  channel.on('postgres_changes',{event:'*',schema:'public',table:'couples',filter:`id=eq.${id}`},scheduleRefresh);
+  channel.subscribe();
+}
+function scheduleRefresh(){clearTimeout(refreshT);refreshT=setTimeout(refresh,400);}
+let renderPending=false;
+async function refresh(){
+  if(!S||!S.coupleId)return;
+  try{
+    const m=await findMembership();
+    if(!m){S=null;ls.set('adviento-cache',null);view='welcome';closeSheetSilently();renderHome();return;}
+    await loadAll(m.couple_id,m.slot);setSyncState(true);
+  }catch(e){setSyncState(false);return;}
+  rerender();
+}
+function rerender(){
+  const a=document.activeElement;
+  if(a&&(a.tagName==='TEXTAREA'||a.tagName==='INPUT')&&$('#sheet').contains(a)){renderPending=true;return;}
+  renderPending=false;
+  if($('#sheet').classList.contains('show')){
+    if(current)renderDay();else if($('#sheet').dataset.page)$('#sheetBody').innerHTML=$('#sheet').dataset.page==='summary'?renderSummary():renderSettings();
+  }
+  renderHome();
+}
+document.addEventListener('focusout',()=>setTimeout(()=>{if(renderPending)rerender();},50));
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){flushAll();refresh();}else flushAll();});
+window.addEventListener('online',()=>{flushAll();refresh();});
+setInterval(()=>{if(document.visibilityState==='visible')refresh();},30000);
 
 /* ---------- UI helpers ---------- */
 const $=s=>document.querySelector(s);
 let toastT;
-function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2300);}
-function flashSaved(){const el=$('#savedNote');if(el){el.textContent='Guardado en este móvil';clearTimeout(el._t);el._t=setTimeout(()=>el.textContent='',1600);}}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600);}
+function flashSaved(){const el=$('#savedNote');if(el){el.textContent='Guardado';clearTimeout(el._t);el._t=setTimeout(()=>el.textContent='',1400);}}
 function modal(html,onMount){$('#mbox').innerHTML=html;$('#modal').classList.add('show');onMount&&onMount($('#mbox'));}
 function closeModal(){$('#modal').classList.remove('show');}
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
@@ -361,89 +513,159 @@ function confirmBox(title,text,okLabel,onOk,danger){
 }
 async function copyText(txt,msg){
   try{await navigator.clipboard.writeText(txt);toast(msg||'Copiado');}
-  catch(e){modal(`<h3>Copiar</h3><p>Tu navegador no deja copiar automáticamente. Mantén pulsado el texto para copiarlo.</p><label class="field"><textarea readonly style="min-height:180px">${esc(txt)}</textarea></label><button class="secondary" data-c>Cerrar</button>`,m=>{m.querySelector('[data-c]').onclick=closeModal;const ta=m.querySelector('textarea');ta.focus();ta.select();});}
+  catch(e){modal(`<h3>Copiar</h3><p>Mantén pulsado el texto para copiarlo.</p><label class="field"><textarea readonly style="min-height:160px">${esc(txt)}</textarea></label><button class="secondary" data-c>Cerrar</button>`,m=>{m.querySelector('[data-c]').onclick=closeModal;const ta=m.querySelector('textarea');ta.focus();ta.select();});}
 }
+async function shareInvite(){
+  const txt=`Te he creado nuestro calendario de Adviento 💝\n\n1. Abre ${location.origin} en Safari\n2. Compartir → Añadir a pantalla de inicio\n3. Ábrela desde el icono y elige "Tengo un código"\n\nNuestro código: ${S.code}`;
+  if(navigator.share){try{await navigator.share({text:txt});return;}catch(e){if(e.name==='AbortError')return;}}
+  copyText(txt,'Invitación copiada. Pégala en WhatsApp.');
+}
+function busy(btn,on,label){if(!btn)return;btn.disabled=on;if(on){btn._l=btn.innerHTML;btn.innerHTML=label||'Un momento…';btn.style.opacity=.7;}else{btn.innerHTML=btn._l||btn.innerHTML;btn.style.opacity=1;}}
+
+/* ---------- pantallas sin pareja ---------- */
+function unlockOpts(sel){
+  return `<button class="opt ${sel==='libre'?'on':''}" data-unlock="libre"><span class="dot"></span><span><b>A nuestro ritmo</b><small>Todas las puertas abiertas. Elegís cuándo y cuál.</small></span></button>
+  <button class="opt ${sel==='diario'?'on':''}" data-unlock="diario"><span class="dot"></span><span><b>Una cada día</b><small>Cada puerta se abre en su fecha de diciembre.</small></span></button>`;
+}
+let draftUnlock='diario';
+const params=new URLSearchParams(location.search);
+const inviteCode=(params.get('c')||'').toUpperCase();
+function installHint(){
+  if(!isIOS()||isStandalone())return '';
+  return `<div class="hint"><b>Antes de empezar:</b> instálala para que no se pierda nada. Pulsa <b>Compartir</b> <span class="shr">${IC.share}</span> → <b>Añadir a pantalla de inicio</b>, y ábrela desde el icono.${inviteCode?` Allí elige "Tengo un código" y escribe <b class="mono">${esc(inviteCode)}</b>.`:''}</div>`;
+}
+function renderWelcome(){
+  $('#app').innerHTML=`<div class="welcome">
+    <div class="heartline">${IC.heart}</div>
+    <div class="big">31 días<br>juntos</div>
+    <p>Cada día de diciembre, una puerta: un recuerdo, una pregunta, algo íntimo o un pequeño reto. Cada uno desde su móvil, en el mismo calendario.</p>
+    ${installHint()}
+    ${inviteCode?`<button class="primary" data-view="join">Unirme al calendario de mi pareja</button><button class="secondary" data-view="create">Crear uno nuevo</button>`
+      :`<button class="primary" data-view="create">Crear nuestro calendario</button><button class="secondary" data-view="join">Tengo un código de mi pareja</button>`}
+    <button class="link" data-view="recover">Ya tenía uno · recuperar acceso</button>
+  </div>`;
+}
+function renderCreate(){
+  $('#app').innerHTML=`<div class="page form">
+    <button class="back" data-view="welcome">${IC.l} Volver</button>
+    <h2>Nuestro calendario</h2><p class="lead">Tú lo creas y le pasas el código a tu pareja.</p>
+    <label class="field"><span>Tu nombre</span><input id="fName" placeholder="Cómo te llama tu pareja" autocomplete="off"></label>
+    <div class="sect">¿Cómo abrimos las puertas?</div>${unlockOpts(draftUnlock)}
+    <button class="primary" id="doCreate" style="margin-top:14px">Crear calendario</button>
+  </div>`;
+}
+function renderJoin(){
+  $('#app').innerHTML=`<div class="page form">
+    <button class="back" data-view="welcome">${IC.l} Volver</button>
+    <h2>Unirme</h2><p class="lead">Escribe el código que te ha pasado tu pareja.</p>
+    <label class="field"><span>Código</span><input id="fCode" class="codein" maxlength="6" placeholder="ABC123" value="${esc(inviteCode)}" autocomplete="off" autocapitalize="characters"></label>
+    <label class="field"><span>Tu nombre</span><input id="fName" placeholder="Cómo te llama tu pareja" autocomplete="off"></label>
+    <button class="primary" id="doJoin" style="margin-top:6px">Unirme</button>
+  </div>`;
+}
+function renderRecover(){
+  $('#app').innerHTML=`<div class="page form">
+    <button class="back" data-view="welcome">${IC.l} Volver</button>
+    <h2>Recuperar acceso</h2><p class="lead">Si cambiaste de móvil o borraste la app, usa el código del calendario y tu clave de recuperación.</p>
+    <label class="field"><span>Código del calendario</span><input id="fCode" class="codein" maxlength="6" placeholder="ABC123" autocomplete="off" autocapitalize="characters"></label>
+    <label class="field"><span>Tu clave de recuperación</span><input id="fRec" class="codein" maxlength="12" placeholder="12 caracteres" autocomplete="off" autocapitalize="characters"></label>
+    <button class="primary" id="doRecover" style="margin-top:6px">Recuperar</button>
+  </div>`;
+}
+function renderCreated(){
+  const joinedNow=created.slot!=='a';
+  $('#app').innerHTML=`<div class="page form" style="text-align:center">
+    <div class="heartline" style="margin-top:10px">${IC.heart}</div>
+    <h2 style="margin-top:10px">${joinedNow?'¡Ya estáis los dos!':'Calendario creado'}</h2>
+    ${joinedNow?`<p class="lead">Ahora compartís el mismo calendario.</p>`:`<p class="lead">Pásale este código a tu pareja:</p>
+    <div class="bigcode">${esc(created.code)}</div>
+    <button class="primary" data-invite>Enviar invitación</button>`}
+    <div class="note" style="text-align:left;margin-top:22px"><b style="color:var(--wine-d)">Tu clave de recuperación: <span class="mono">${esc(created.recovery)}</span></b><br>Guárdala en una nota. Si cambias de móvil o borras la app, con ella y el código <span class="mono">${esc(created.code)}</span> recuperas tu acceso. También la tienes en Ajustes.</div>
+    <button class="secondary" data-copyrec>Copiar clave</button>
+    <button class="${joinedNow?'primary':'secondary'}" data-view="home" style="margin-top:16px">Ir al calendario</button>
+  </div>`;
+}
+function renderSetup(){
+  $('#app').innerHTML=`<div class="welcome"><div class="heartline">${IC.heart}</div><div class="big" style="font-size:34px">Falta un paso</div>
+  <p>La app aún no está conectada a su base de datos. Rellena <span class="mono">config.js</span> con la URL y la clave pública de Supabase.</p></div>`;
+}
+function renderLoading(){$('#app').innerHTML=`<div class="welcome"><div class="heartline pulse">${IC.heart}</div></div>`;}
 
 /* ---------- pantalla principal ---------- */
 function renderHome(){
-  if(!S.welcomed){renderWelcome();return;}
+  if(view!=='home'){({loading:renderLoading,setup:renderSetup,welcome:renderWelcome,create:renderCreate,join:renderJoin,recover:renderRecover,created:renderCreated})[view]();return;}
   const {o,d}=counts();
-  const names=(S.names.a.trim()&&S.names.b.trim())?`${esc(S.names.a)} & ${esc(S.names.b)}`:'31 días para cerrar el año juntos';
+  const names=partnerJoined()?`${esc(nm('a'))} & ${esc(nm('b'))}`:esc(myName());
   let cells='';
   for(let n=1;n<=31;n++){
     const st=S.days[n]||{};const un=isUnlocked(n);const c=content(n);
     const cls=['box','c'+((n*7)%3)];
     if(st.done)cls.push('done');else if(st.opened)cls.push('open');
     if(!un)cls.push('locked');if(isToday(n))cls.push('today');if(n===31)cls.push('wide');
+    const waiting=modeOf(n)==='individual'&&st.opened&&!st.done&&submitted(n,other())&&!submitted(n,S.me);
     const di=IC[DOOR_ICONS[n%4]];
     const inIcon=st.done?IC.check:IC[CATS[c.c].i];
     const lbl=n===31?`<span class="lbl">${st.opened||st.done?'Nuestra cápsula del tiempo':'La última puerta'}</span>`:'';
     cells+=`<button class="${cls.join(' ')}" data-day="${n}" aria-label="Día ${n}${st.done?', completado':st.opened?', descubierto':''}">
-      <span class="inside"><span class="n">${n}</span>${lbl}${inIcon}</span>
+      <span class="inside"><span class="n">${n}</span>${lbl}${inIcon}${waiting?'<span class="ping"></span>':''}</span>
       <span class="door"><span class="n">${n}</span>${lbl}${n===31?IC.gift:di}${!un?`<span class="lock">${IC.lock}</span>`:''}</span>
     </button>`;
   }
   $('#app').innerHTML=`
    <header class="top">
-     <div><div class="eyebrow">Diciembre ${S.year}</div><h1>Nuestro <span>Adviento</span></h1></div>
+     <div><div class="eyebrow">Diciembre ${S.year} <span id="syncDot" class="sync ${online?'':'off'}"></span></div><h1>Nuestro <span>Adviento</span></h1></div>
      <div class="icons"><button class="ibtn" data-go="summary" aria-label="Nuestro año">${IC.book}</button><button class="ibtn" data-go="settings" aria-label="Ajustes">${IC.gear}</button></div>
    </header>
    <p class="sub">${names}</p>
+   ${partnerJoined()?'':`<div class="invite"><div><b>Falta tu pareja</b><br><small>Pásale el código <span class="mono">${esc(S.code)}</span> para compartir el calendario.</small></div><button class="pill" data-invite>Invitar</button></div>`}
    <div class="prog">
      <div class="prog-row"><b>${o} de 31 días descubiertos</b><small>${d} ${d===1?'completado':'completados'}</small></div>
      <div class="bar"><i class="o" style="width:${o/31*100}%"></i><i class="d" style="width:${d/31*100}%"></i></div>
-     ${!canStore?'<div class="warn">Este navegador no permite guardar (¿modo privado?). Lo que hagáis se perderá al cerrar.</div>':''}
    </div>
    <div class="grid">${cells}</div>
    <p class="foot">Sin prisa y sin deberes. Un ratito al día, a vuestro ritmo.</p>`;
 }
 
-function renderWelcome(){
-  $('#app').innerHTML=`<div class="welcome">
-    <div class="heartline">${IC.heart}</div>
-    <div class="big">31 días<br>juntos</div>
-    <p>Cada día de diciembre, una puerta: un recuerdo, una pregunta, algo íntimo o un pequeño reto. Para recordar el año y empezar a soñar el siguiente.</p>
-    <div style="text-align:left">
-      <div class="row2">
-        <label class="field"><span>Uno</span><input id="wa" placeholder="Nombre" value="${esc(S.names.a)}" autocomplete="off"></label>
-        <label class="field"><span>Otro</span><input id="wb" placeholder="Nombre" value="${esc(S.names.b)}" autocomplete="off"></label>
-      </div>
-      <div class="sect" style="margin-top:8px">¿Cómo queréis abrir las puertas?</div>
-      ${unlockOpts()}
-    </div>
-    <button class="primary" id="wgo" style="margin-top:18px">Empezar nuestro Adviento</button>
-    <p style="font-size:13px;margin-top:16px">Todo se guarda solo en este móvil. Nada sale de aquí.</p>
-  </div>`;
-}
-function unlockOpts(){
-  return `<button class="opt ${S.unlock==='libre'?'on':''}" data-unlock="libre"><span class="dot"></span><span><b>A nuestro ritmo</b><small>Todas las puertas abiertas. Elegís cuándo y cuál.</small></span></button>
-  <button class="opt ${S.unlock==='diario'?'on':''}" data-unlock="diario"><span class="dot"></span><span><b>Una cada día</b><small>Cada puerta se abre en su fecha de diciembre, como un calendario de verdad.</small></span></button>`;
-}
-
 /* ---------- día ---------- */
 let current=null;
 function openDay(n,fromBox){
-  if(!isUnlocked(n)){const dt=dateOf(n);toast(`Esta puerta se abre el ${n} de diciembre`);return;}
-  const st=D(n);const first=!st.opened;
-  const go=()=>{st.opened=true;save(true);current=n;renderDay(first);$('#sheet').classList.add('show');$('#sheetScroll').scrollTop=0;};
+  if(!isUnlocked(n)){toast(`Esta puerta se abre el ${n} de diciembre`);return;}
+  const first=!D(n).opened;
+  const go=()=>{if(first)dayPatch(n,{opened:true},true);current=n;delete $('#sheet').dataset.page;renderDay(first);$('#sheet').classList.add('show');$('#sheetScroll').scrollTop=0;};
   if(first&&fromBox){fromBox.classList.add('open');setTimeout(go,480);}else go();
 }
-function closeSheet(){$('#sheet').classList.remove('show');current=null;renderHome();}
+function closeSheetSilently(){$('#sheet').classList.remove('show');current=null;delete $('#sheet').dataset.page;}
+function closeSheet(){flushAll();closeSheetSilently();renderHome();}
+
+function individualHTML(n){
+  const me=S.me,ot=other(),mine=A(n,me),meSub=submitted(n,me),otSub=submitted(n,ot);
+  const both=meSub&&otSub;
+  let theirs;
+  if(both)theirs=`<div class="answer">${esc(A(n,ot).body)||'<i>(sin texto)</i>'}</div>`;
+  else if(!partnerJoined())theirs=`<div class="status">Cuando ${esc(pn())} se una, responderá aquí.</div>`;
+  else if(otSub)theirs=`<div class="status ready">${IC.check} Ya ha respondido. Envía la tuya para leerla.</div>`;
+  else theirs=`<div class="status">Aún no ha respondido.</div>`;
+  return `<div class="card"><label>${esc(myName())} <span class="tag">tu respuesta</span></label>
+      <textarea data-ans placeholder="Escribe con calma. ${esc(pn()[0].toUpperCase()+pn().slice(1))} la verá cuando los dos hayáis enviado.">${esc(mine.body)}</textarea>
+      ${meSub?`<div class="sent">${IC.check} Enviada${both?'':' · podéis seguir editándola'}</div>`:`<button class="send" data-submit>Enviar mi respuesta</button>`}
+    </div>
+    <div class="card ${both?'reveal-in':''}"><label>${esc(partnerName())}</label>${theirs}</div>`;
+}
 
 function renderDay(firstReveal){
   const n=current,st=D(n),c=content(n),mode=modeOf(n),dt=dateOf(n);
   $('#sheetTop').innerHTML=`<button class="ibtn" data-close aria-label="Cerrar">${IC.x}</button>
     <div class="mid">Día ${n} · ${DOW[dt.getDay()]} ${n} dic</div>
     <div class="navs"><button class="ibtn" data-prev ${n===1?'disabled style="opacity:.35"':''} aria-label="Día anterior">${IC.l}</button><button class="ibtn" data-next ${n===31?'disabled style="opacity:.35"':''} aria-label="Día siguiente">${IC.r}</button></div>`;
-  const blur=S.discreto&&c.c==='intimidad'&&!st._shown;
+  const blur=P.discreto&&c.c==='intimidad'&&!st._shown;
   let notes='';
-  if(mode==='individual'){
-    notes=['a','b'].map(k=>`<div class="card"><label>${esc(k==='a'?nameA():nameB())}<button class="mini" data-hide="${k}">${IC.eye}${st.hide[k]?'Mostrar':'Ocultar'}</button></label>
-      <textarea data-note="${k}" class="${st.hide[k]?'hid':''}" placeholder="${st.hide[k]?'':'Tu respuesta… (pulsa Ocultar antes de pasar el móvil)'}">${esc(st.notes[k])}</textarea></div>`).join('');
-  }else{
-    const ph={juntos:'Lo que no queremos olvidar de esta conversación…',conjunta:'Nuestra respuesta…',reto:'¿Cómo fue? ¿Qué canción, qué foto, qué regalo?'}[mode];
-    const lb={juntos:'Notas',conjunta:'Nuestra respuesta',reto:'Cómo fue'}[mode];
-    notes=`<div class="card"><label>${lb}</label><textarea data-note="shared" placeholder="${ph}">${esc(st.notes.shared)}</textarea></div>`;
+  if(n!==31){
+    if(mode==='individual')notes=individualHTML(n);
+    else{
+      const ph={juntos:'Lo que no queremos olvidar de esta conversación…',conjunta:'Nuestra respuesta…',reto:'¿Cómo fue? ¿Qué canción, qué foto, qué regalo?'}[mode];
+      const lb={juntos:'Notas compartidas',conjunta:'Nuestra respuesta',reto:'Cómo fue'}[mode];
+      notes=`<div class="card"><label>${lb} <span class="tag">la veis los dos</span></label><textarea data-note placeholder="${ph}">${esc(st.shared_note)}</textarea></div>`;
+    }
   }
   $('#sheetBody').innerHTML=`<div class="${firstReveal?'reveal-in':''}">
     <span class="chip cat-${c.c}">${CATS[c.c].l}</span>
@@ -453,8 +675,7 @@ function renderDay(firstReveal){
     ${blur?'<div class="reveal-hint">Modo discreto · toca para ver</div>':''}
     </div>
     ${n===31?'':`<div class="seg">${Object.entries(MODES).map(([k,v])=>`<button data-mode="${k}" class="${k===mode?'on':''}">${v.l}</button>`).join('')}</div>
-    <p class="modehelp">${MODES[mode].h}</p>
-    ${notes}`}
+    <p class="modehelp">${MODES[mode].h}</p>${notes}`}
     <div class="saved" id="savedNote"></div>
     ${n===31?capsuleHTML():''}
     <button class="primary ${st.done?'isdone':''}" data-done>${st.done?IC.check+' Completado':'Marcar como completado'}</button>
@@ -469,7 +690,7 @@ function renderDay(firstReveal){
 function capsuleHTML(){
   const cp=S.capsule,openDate=new Date(S.year+1,11,31),now=new Date();
   if(!cp.sealed) return `<div class="capsule"><h3>Carta para nosotros de dentro de un año</h3>
-    <p>Escribidla juntos. Al sellarla, quedará guardada hasta el 31 de diciembre de ${S.year+1}.</p>
+    <p>La escribís entre los dos, cada uno desde su móvil. Al sellarla, quedará guardada hasta el 31 de diciembre de ${S.year+1}.</p>
     <textarea data-capsule placeholder="Queridos nosotros del próximo diciembre…">${esc(cp.text)}</textarea>
     <button class="secondary" data-seal style="margin-top:10px">Sellar la cápsula</button></div>`;
   const ready=now>=openDate||cp.openedEarly;
@@ -484,15 +705,20 @@ function fmtDate(iso){if(!iso)return '—';const d=new Date(iso);return `${d.get
 function envelopeSVG(){return `<svg viewBox="0 0 150 110"><rect x="8" y="16" width="134" height="86" rx="6" fill="#F7EDDD" stroke="#D9C5A6"/><path d="M8 22 75 66l67-44" fill="none" stroke="#D9C5A6" stroke-width="1.5"/><circle cx="75" cy="64" r="15" fill="#7B2D3B"/><circle cx="75" cy="64" r="11" fill="none" stroke="#A54A5A" stroke-width="1.5"/><path d="M75 70.5s-6-3.7-6-7.4c0-2 1.4-3.3 3-3.3 1.3 0 2.2.8 3 1.9.8-1.1 1.7-1.9 3-1.9 1.6 0 3 1.3 3 3.3 0 3.7-6 7.4-6 7.4Z" fill="#E7C99A"/></svg>`;}
 
 /* ---------- resumen ---------- */
+function dayParts(n){
+  const st=S.days[n];const parts=[];
+  if(st&&st.shared_note&&st.shared_note.trim())parts.push(['',st.shared_note]);
+  for(const s of ['a','b']){
+    const a=S.answers[n]?.[s];if(!a||!a.body.trim())continue;
+    if(s===S.me)parts.push([nm(s)+(submitted(n,s)?'':' (borrador)'),a.body]);
+    else if(submitted(n,S.me)&&submitted(n,s))parts.push([nm(s),a.body]);
+  }
+  return parts;
+}
 function renderSummary(){
   const {o,d}=counts();let notes=0,items='';
   for(let n=1;n<=31;n++){
-    const st=S.days[n];if(!st)continue;const c=content(n);
-    const parts=[];
-    if(st.notes.shared.trim())parts.push(['',st.notes.shared]);
-    if(st.notes.a.trim())parts.push([nameA(),st.notes.a]);
-    if(st.notes.b.trim())parts.push([nameB(),st.notes.b]);
-    if(!parts.length)continue;notes++;
+    const parts=dayParts(n);if(!parts.length)continue;notes++;const c=content(n);
     items+=`<div class="mem"><div class="h">Día ${n} · ${CATS[c.c].l}</div><div class="t">${esc(c.t)}</div>${parts.map(([w,t])=>`${w?`<div class="who">${esc(w)}</div>`:''}<div class="txt">${esc(t)}</div>`).join('')}</div>`;
   }
   const cp=S.capsule;
@@ -506,27 +732,29 @@ function renderSummary(){
 }
 function allText(){
   let out=`NUESTRO ADVIENTO ${S.year}\n\n`;
-  for(let n=1;n<=31;n++){const st=S.days[n];if(!st)continue;const c=content(n);
-    const p=[];if(st.notes.shared.trim())p.push(st.notes.shared);if(st.notes.a.trim())p.push(nameA()+': '+st.notes.a);if(st.notes.b.trim())p.push(nameB()+': '+st.notes.b);
-    if(p.length)out+=`Día ${n} — ${c.t}\n${c.q}\n${p.join('\n')}\n\n`;}
+  for(let n=1;n<=31;n++){const p=dayParts(n);if(!p.length)continue;const c=content(n);
+    out+=`Día ${n} — ${c.t}\n${c.q}\n${p.map(([w,t])=>(w?w+': ':'')+t).join('\n')}\n\n`;}
   return out.trim();
 }
 
 /* ---------- ajustes ---------- */
 function renderSettings(){
-  return `<div class="page"><h2>Ajustes</h2><p class="lead">Hacedlo vuestro.</p>
-   <div class="row2"><label class="field"><span>Uno</span><input data-name="a" value="${esc(S.names.a)}" placeholder="Nombre"></label>
-   <label class="field"><span>Otro</span><input data-name="b" value="${esc(S.names.b)}" placeholder="Nombre"></label></div>
-   <label class="field"><span>Año del calendario</span><select data-year>${[S.year-1,S.year,S.year+1].filter((v,i,a)=>a.indexOf(v)===i).map(y=>`<option ${y===S.year?'selected':''}>${y}</option>`).join('')}</select></label>
-   <div class="sect">Apertura de puertas</div>${unlockOpts()}
+  const rec=ls.get('adviento-recovery-'+S.coupleId,null);
+  return `<div class="page"><h2>Ajustes</h2><p class="lead">Lo que cambiéis aquí lo veis los dos, salvo el modo discreto.</p>
+   <div class="row2"><label class="field"><span>Tu nombre</span><input data-myname value="${esc(S.names[S.me])}" placeholder="Nombre"></label>
+   <label class="field"><span>Tu pareja</span><input value="${esc(partnerJoined()?S.names[other()]:'')}" placeholder="${partnerJoined()?'':'Aún no se ha unido'}" disabled></label></div>
+   <label class="field"><span>Año del calendario</span><select data-year>${[S.year-1,S.year,S.year+1].map(y=>`<option ${y===S.year?'selected':''}>${y}</option>`).join('')}</select></label>
+   <div class="sect">Apertura de puertas</div>${unlockOpts(S.unlock)}
+   <div class="sect">Vuestro calendario</div>
+   <div class="note">Código: <b class="mono">${esc(S.code)}</b>${partnerJoined()?' · ya estáis los dos':' · falta tu pareja'}<br>
+   Tu clave de recuperación: <b class="mono">${rec?esc(rec):'—'}</b>${rec?'':'<br><small>Se mostró al crear o unirte. Si no la guardaste, no hay forma de verla de nuevo.</small>'}</div>
+   ${partnerJoined()?'':'<button class="secondary" data-invite>Invitar a mi pareja</button>'}
+   ${rec?'<button class="secondary" data-copyrec>Copiar clave de recuperación</button>':''}
    <div class="sect">Privacidad</div>
-   <button class="switch ${S.discreto?'on':''}" data-discreto><span><b>Modo discreto</b><br><small style="color:var(--muted)">Las preguntas íntimas aparecen difuminadas hasta que las tocáis.</small></span><span class="k"></span></button>
-   <div class="note" style="margin-top:10px">Todo lo que escribís se guarda solo en este navegador, en este móvil. No hay cuentas, no se envía a ningún servidor y nadie más lo ve. Si borráis los datos del navegador o cambiáis de móvil, se pierde: haced una copia de seguridad de vez en cuando.</div>
-   <div class="sect">Copia de seguridad</div>
-   <button class="secondary" data-backup>Copiar copia de seguridad</button>
-   <button class="secondary" data-restore>Restaurar desde una copia</button>
-   <div class="sect">Empezar de cero</div>
-   <button class="secondary danger" data-reset>Borrar todas las respuestas y el progreso</button>
+   <button class="switch ${P.discreto?'on':''}" data-discreto><span><b>Modo discreto</b><br><small style="color:var(--muted)">En este móvil, las preguntas íntimas aparecen difuminadas hasta que las tocas.</small></span><span class="k"></span></button>
+   <div class="note" style="margin-top:10px">Vuestras respuestas se guardan en una base de datos privada y solo las podéis leer vosotros dos. En los días de "Cada uno", la respuesta de tu pareja no te llega hasta que los dos la habéis enviado. No hay correos, ni anuncios, ni nada que se comparta con terceros.</div>
+   <div class="sect">Salir</div>
+   <button class="secondary danger" data-leave>Salir de este calendario en este móvil</button>
   </div>`;
 }
 
@@ -539,50 +767,109 @@ function openPage(kind){
 }
 
 /* ---------- acciones ---------- */
+async function afterMembership(res){
+  if(res.recovery)ls.set('adviento-recovery-'+res.couple_id,res.recovery);
+  S=null;await loadAll(res.couple_id,res.slot);subscribe();
+  if(inviteCode)history.replaceState(null,'',location.pathname);
+}
+async function doCreate(btn){
+  const name=$('#fName').value.trim();if(!name){toast('Escribe tu nombre');return;}
+  busy(btn,true);
+  try{await ensureSession();const {data,error}=await sb.rpc('create_couple',{p_name:name,p_year:defaultYear(),p_unlock:draftUnlock});if(error)throw error;
+    await afterMembership(data);created=data;view='created';renderHome();}
+  catch(e){toast(errMsg(e));busy(btn,false);}
+}
+async function doJoin(btn){
+  const code=$('#fCode').value.trim().toUpperCase(),name=$('#fName').value.trim();
+  if(code.length<6){toast('El código tiene 6 caracteres');return;}if(!name){toast('Escribe tu nombre');return;}
+  busy(btn,true);
+  try{await ensureSession();const {data,error}=await sb.rpc('join_couple',{p_code:code,p_name:name});if(error)throw error;
+    await afterMembership(data);created=data;view='created';renderHome();}
+  catch(e){toast(errMsg(e));busy(btn,false);}
+}
+async function doRecover(btn){
+  const code=$('#fCode').value.trim().toUpperCase(),rec=$('#fRec').value.trim().toUpperCase();
+  if(code.length<6||rec.length<12){toast('Revisa el código y la clave');return;}
+  busy(btn,true);
+  try{await ensureSession();const {data,error}=await sb.rpc('recover_member',{p_code:code,p_recovery:rec});if(error)throw error;
+    ls.set('adviento-recovery-'+data.couple_id,rec);await afterMembership(data);view='home';renderHome();toast('Acceso recuperado');}
+  catch(e){toast(errMsg(e));busy(btn,false);}
+}
+function defaultYear(){const d=new Date();return d.getMonth()===0&&d.getDate()<15?d.getFullYear()-1:d.getFullYear();}
+
 document.addEventListener('click',e=>{
-  const t=e.target.closest('button,[data-unblur]');if(!t)return;
+  const t=e.target.closest('button,[data-unblur]');if(!t||t.disabled)return;
   const ds=t.dataset;
+  if(ds.view){view=ds.view;if(view==='home')created=null;renderHome();window.scrollTo(0,0);return;}
+  if(t.id==='doCreate'){doCreate(t);return;}
+  if(t.id==='doJoin'){doJoin(t);return;}
+  if(t.id==='doRecover'){doRecover(t);return;}
+  if('invite' in ds){shareInvite();return;}
+  if('copyrec' in ds){const r=created?.recovery||ls.get('adviento-recovery-'+S.coupleId,'');copyText(`Nuestro Adviento\nCódigo: ${S.code}\nMi clave de recuperación: ${r}`,'Clave copiada. Guárdala en una nota.');return;}
+  if(ds.unlock){
+    if(view==='home'){S.unlock=ds.unlock;coupleUpdate({unlock:ds.unlock});}else draftUnlock=ds.unlock;
+    document.querySelectorAll('[data-unlock]').forEach(b=>b.classList.toggle('on',b.dataset.unlock===ds.unlock));return;}
+  if(!S)return;
   if(ds.day){openDay(+ds.day,t);return;}
   if(ds.go){openPage(ds.go);return;}
   if('close' in ds){closeSheet();return;}
   if('prev' in ds&&current>1){navTo(current-1);return;}
   if('next' in ds&&current<31){navTo(current+1);return;}
-  if(ds.unlock){S.unlock=ds.unlock;save(true);document.querySelectorAll('[data-unlock]').forEach(b=>b.classList.toggle('on',b.dataset.unlock===S.unlock));return;}
-  if(t.id==='wgo'){S.names.a=$('#wa').value.trim();S.names.b=$('#wb').value.trim();S.welcomed=true;save(true);renderHome();return;}
   if('unblur' in ds){D(current)._shown=true;renderDay(true);return;}
-  if(ds.mode){D(current).mode=ds.mode;save(true);renderDay();return;}
-  if(ds.hide){const st=D(current);st.hide[ds.hide]=!st.hide[ds.hide];save(true);renderDay();return;}
-  if('done' in ds){const st=D(current);st.done=!st.done;save(true);renderDay();if(st.done)toast(current===31?'Fin del Adviento. Feliz año nuevo, vosotros.':'Día '+current+' completado');return;}
+  if(ds.mode){dayPatch(current,{mode:ds.mode},true);renderDay();return;}
+  if('submit' in ds){submitAnswer(current,t);return;}
+  if('done' in ds){const n=current,v=!D(n).done;dayPatch(n,{done:v},true);renderDay();if(v)toast(n===31?'Fin del Adviento. Feliz año nuevo, vosotros.':'Día '+n+' completado');return;}
   if('edit' in ds){editDay(current);return;}
   if('swap' in ds){swapDay(current);return;}
-  if('share' in ds){const c=content(current);copyText(`Día ${current} — ${c.t}\n${c.q}`,'Pregunta copiada para compartir');return;}
+  if('share' in ds){const c=content(current);copyText(`Día ${current} — ${c.t}\n${c.q}`,'Pregunta copiada');return;}
   if('seal' in ds){
+    flushAll();
     if(!S.capsule.text.trim()){toast('Escribid algo antes de sellarla');return;}
-    confirmBox('¿Sellamos la cápsula?',`No podréis leerla ni cambiarla hasta el 31 de diciembre de ${S.year+1}.`,'Sellar',()=>{S.capsule.sealed=true;S.capsule.sealedAt=new Date().toISOString();save(true);renderDay();toast('Cápsula sellada hasta el próximo diciembre');});return;}
-  if('early' in ds){confirmBox('¿Abrirla ya?','La gracia es esperar un año… pero es vuestra carta.','Abrir ahora',()=>{S.capsule.openedEarly=true;save(true);renderDay();});return;}
+    confirmBox('¿Sellamos la cápsula?',`Ninguno de los dos podrá leerla ni cambiarla hasta el 31 de diciembre de ${S.year+1}.`,'Sellar',async()=>{
+      const at=new Date().toISOString();
+      ls.set('adviento-capsule-'+S.coupleId,{text:S.capsule.text,sealedAt:at});
+      Object.assign(S.capsule,{sealed:true,sealedAt:at});await coupleUpdate({capsule_text:S.capsule.text,capsule_sealed:true,capsule_sealed_at:at});renderDay();toast('Cápsula sellada hasta el próximo diciembre');});return;}
+  if('early' in ds){confirmBox('¿Abrirla ya?','La gracia es esperar un año… pero es vuestra carta. Se abrirá para los dos.','Abrir ahora',()=>{S.capsule.openedEarly=true;coupleUpdate({capsule_opened_early:true});renderDay();});return;}
   if('copyall' in ds){copyText(allText(),'Recuerdos copiados');return;}
-  if('discreto' in ds){S.discreto=!S.discreto;save(true);t.classList.toggle('on',S.discreto);return;}
-  if('backup' in ds){copyText(JSON.stringify(S),'Copia de seguridad copiada. Guárdala en una nota privada.');return;}
-  if('restore' in ds){restore();return;}
-  if('reset' in ds){confirmBox('¿Borrar todo?','Se eliminarán las respuestas, notas, el progreso y la cápsula de este móvil. No se puede deshacer.','Borrar todo',()=>{const keep={names:S.names,year:S.year,unlock:S.unlock,welcomed:true};S=Object.assign(fresh(),keep);save(true);openPage('settings');toast('Todo borrado');},true);return;}
+  if('discreto' in ds){P.discreto=!P.discreto;savePrefs();t.classList.toggle('on',P.discreto);return;}
+  if('leave' in ds){confirmBox('¿Salir del calendario?',partnerJoined()?`Este móvil dejará de estar conectado. ${esc(pn()[0].toUpperCase()+pn().slice(1))} conserva el calendario y podrás volver a unirte con el código.`:'Eres la única persona en este calendario: se borrará entero.','Salir',async()=>{
+      flushAll();const {error}=await sb.rpc('leave_couple');if(error){toast(errMsg(error));return;}
+      if(channel)sb.removeChannel(channel);S=null;ls.set('adviento-cache',null);closeSheetSilently();view='welcome';renderHome();},true);return;}
 });
+async function submitAnswer(n,btn){
+  const body=A(n,S.me).body;if(!body.trim()){toast('Escribe algo antes de enviar');return;}
+  busy(btn,true,'Enviando…');
+  pending.delete('ans:'+n);dirty.delete('ans:'+n);
+  try{
+    await write(sb.from('answers').upsert({couple_id:S.coupleId,n,slot:S.me,body,submitted:true,updated_at:new Date().toISOString()},{onConflict:'couple_id,n,slot'}));
+    await write(sb.from('days').upsert({couple_id:S.coupleId,n,opened:true,updated_at:new Date().toISOString()},{onConflict:'couple_id,n'}));
+    await loadAll(S.coupleId,S.me);renderDay();
+    toast(submitted(n,other())?'¡Ya podéis leer las dos respuestas!':'Enviada. Te avisaremos aquí cuando responda.');
+  }catch(e){toast('No se pudo enviar. Revisa la conexión.');busy(btn,false);}
+}
 function navTo(n){
+  flushAll();
   if(!isUnlocked(n)){toast(`Esta puerta se abre el ${n} de diciembre`);return;}
-  const first=!D(n).opened;D(n).opened=true;save(true);current=n;renderDay(first);$('#sheetScroll').scrollTop=0;
+  const first=!D(n).opened;if(first)dayPatch(n,{opened:true},true);current=n;renderDay(first);$('#sheetScroll').scrollTop=0;
 }
 document.addEventListener('input',e=>{
-  const t=e.target,ds=t.dataset;
-  if(ds.note&&current){D(current).notes[ds.note]=t.value;save();}
-  else if('capsule' in ds){S.capsule.text=t.value;save();}
-  else if(ds.name){S.names[ds.name]=t.value;save(true);}
+  const t=e.target,ds=t.dataset;if(!S)return;
+  if('note' in ds&&current){const n=current;D(n).shared_note=t.value;cacheState();
+    queue('note:'+n,()=>write(sb.from('days').upsert({couple_id:S.coupleId,n,shared_note:D(n).shared_note,updated_at:new Date().toISOString()},{onConflict:'couple_id,n'})));}
+  else if('ans' in ds&&current){const n=current;A(n,S.me).body=t.value;cacheState();
+    queue('ans:'+n,()=>write(sb.from('answers').upsert({couple_id:S.coupleId,n,slot:S.me,body:A(n,S.me).body,updated_at:new Date().toISOString()},{onConflict:'couple_id,n,slot'})));}
+  else if('capsule' in ds){S.capsule.text=t.value;cacheState();
+    queue('capsule',()=>write(sb.from('couples').update({capsule_text:S.capsule.text}).eq('id',S.coupleId)));}
+  else if('myname' in ds){S.names[S.me]=t.value;
+    queue('name',()=>write(sb.from('members').update({name:S.names[S.me].trim()}).eq('couple_id',S.coupleId).eq('slot',S.me)),900);}
 });
 document.addEventListener('change',e=>{
-  if('year' in e.target.dataset){S.year=+e.target.value;save(true);toast('Calendario de '+S.year);}
+  if('year' in e.target.dataset&&S){S.year=+e.target.value;coupleUpdate({year:S.year});toast('Calendario de '+S.year);}
 });
 
 function editDay(n){
   const c=content(n);
-  modal(`<h3>Editar día ${n}</h3><p>Cambiad el texto a vuestro gusto.</p>
+  modal(`<h3>Editar día ${n}</h3><p>El cambio lo veréis los dos.</p>
    <label class="field"><span>Título</span><input id="et" value="${esc(c.t)}"></label>
    <label class="field"><span>Pregunta o actividad</span><textarea id="eq">${esc(c.q)}</textarea></label>
    <label class="field"><span>Categoría</span><select id="ec">${Object.entries(CATS).map(([k,v])=>`<option value="${k}" ${k===c.c?'selected':''}>${v.l}</option>`).join('')}</select></label>
@@ -590,29 +877,35 @@ function editDay(n){
    ${D(n).custom?'<button class="secondary" data-orig style="margin-top:8px">Volver a la pregunta original</button>':''}`,m=>{
     m.querySelector('[data-c]').onclick=closeModal;
     m.querySelector('[data-ok]').onclick=()=>{const t=m.querySelector('#et').value.trim(),q=m.querySelector('#eq').value.trim();if(!t||!q){toast('Falta el título o el texto');return;}
-      D(n).custom={t,q,c:m.querySelector('#ec').value};save(true);closeModal();renderDay();toast('Día '+n+' actualizado');};
-    const o=m.querySelector('[data-orig]');if(o)o.onclick=()=>{D(n).custom=null;save(true);closeModal();renderDay();};
+      dayPatch(n,{custom:{t,q,c:m.querySelector('#ec').value}},true);closeModal();renderDay();toast('Día '+n+' actualizado');};
+    const o=m.querySelector('[data-orig]');if(o)o.onclick=()=>{dayPatch(n,{custom:null},true);closeModal();renderDay();};
   });
 }
 function swapDay(n){
   const c=content(n);const list=BANK[c.c]||BANK.recuerdos;
   const used=new Set();for(let i=1;i<=31;i++)used.add(content(i).q);
-  const st=D(n);let pick=null;
-  for(let k=0;k<list.length;k++){const cand=list[(st.swapIdx+k)%list.length];if(!used.has(cand[1])){pick=cand;st.swapIdx=(st.swapIdx+k+1)%list.length;break;}}
-  if(!pick){pick=list[st.swapIdx%list.length];st.swapIdx++;}
-  st.custom={t:pick[0],q:pick[1],c:c.c};save(true);renderDay(true);toast('Nueva pregunta de '+CATS[c.c].l.toLowerCase());
-}
-function restore(){
-  modal(`<h3>Restaurar</h3><p>Pega aquí el texto de la copia de seguridad. Sustituirá lo que hay ahora en este móvil.</p>
-   <label class="field"><textarea id="rj" placeholder='{"v":1,…}'></textarea></label>
-   <div class="mrow"><button class="secondary" data-c>Cancelar</button><button class="primary" data-ok>Restaurar</button></div>`,m=>{
-    m.querySelector('[data-c]').onclick=closeModal;
-    m.querySelector('[data-ok]').onclick=()=>{try{const o=JSON.parse(m.querySelector('#rj').value);if(!o||o.v!==1||typeof o.days!=='object')throw 0;S=Object.assign(fresh(),o);save(true);closeModal();openPage('settings');toast('Copia restaurada');}catch(err){toast('Ese texto no es una copia válida');}};
-  });
+  let idx=swapIdx[n]||0,pick=null;
+  for(let k=0;k<list.length;k++){const cand=list[(idx+k)%list.length];if(!used.has(cand[1])){pick=cand;idx=(idx+k+1)%list.length;break;}}
+  if(!pick){pick=list[idx%list.length];idx++;}
+  swapIdx[n]=idx;
+  dayPatch(n,{custom:{t:pick[0],q:pick[1],c:c.c}},true);renderDay(true);toast('Nueva pregunta de '+CATS[c.c].l.toLowerCase());
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#modal').classList.contains('show'))closeModal();else if($('#sheet').classList.contains('show'))closeSheet();}});
 
-renderHome();
+/* ---------- arranque ---------- */
+(async function boot(){
+  if(!CONFIGURED){view='setup';renderHome();return;}
+  const cached=ls.get('adviento-cache',null);
+  if(cached&&cached.coupleId){S=cached;view='home';renderHome();}else{renderHome();}
+  try{
+    const m=await findMembership();
+    if(!m){S=null;ls.set('adviento-cache',null);view='welcome';renderHome();return;}
+    await loadAll(m.couple_id,m.slot);subscribe();view='home';rerender();
+  }catch(e){
+    if(S){setSyncState(false);}else{view='welcome';renderHome();toast(errMsg(e));}
+  }
+})();
+
 </script>
 </body>
 </html>
