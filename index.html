@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F6EFE4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Adviento">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/icon-192.png">
+<title>Nuestro Adviento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#F6EFE4; --paper:#FCF8F2; --beige:#EADFCD; --line:#E2D4BF;
+  --wine:#7B2D3B; --wine-d:#5C1F2A; --rose:#E6C2BC; --rose-l:#F4E2DE;
+  --green:#2F4737; --green-l:#DCE5DC; --gold:#B8925A; --ink:#38282A; --muted:#8B766B;
+  --serif:'Fraunces', Georgia, serif; --sans:'DM Sans', system-ui, sans-serif;
+  --st:env(safe-area-inset-top,0px); --sb:env(safe-area-inset-bottom,0px);
+  --r:16px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45}
+body{min-height:100vh;
+  background-image:radial-gradient(circle at 15% 0%,rgba(230,194,188,.45),transparent 45%),
+  radial-gradient(circle at 100% 30%,rgba(220,229,220,.6),transparent 40%);
+  background-attachment:fixed}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+textarea,input,select{font:inherit;color:var(--ink)}
+.app{max-width:560px;margin:0 auto;padding:calc(var(--st) + 18px) 18px calc(var(--sb) + 40px)}
+
+/* header */
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:500}
+h1{font-family:var(--serif);font-weight:400;font-style:italic;font-size:38px;line-height:1.05;margin:4px 0 0;color:var(--wine-d)}
+h1 span{font-style:normal;font-weight:600;color:var(--green)}
+.icons{display:flex;gap:6px;margin-top:4px}
+.ibtn{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--paper);border:1px solid var(--line);color:var(--wine)}
+.ibtn svg{width:20px;height:20px}
+.sub{margin:10px 0 0;color:var(--muted);font-size:15px}
+
+/* progress */
+.prog{margin:20px 0 18px;padding:14px 16px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r)}
+.prog-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.prog b{font-family:var(--serif);font-weight:600;font-size:20px;color:var(--wine-d)}
+.prog small{color:var(--muted);font-size:13px}
+.bar{height:6px;background:var(--beige);border-radius:9px;margin-top:10px;overflow:hidden;position:relative}
+.bar i{position:absolute;inset:0 auto 0 0;border-radius:9px;transition:width .6s ease}
+.bar .o{background:var(--rose)}
+.bar .d{background:var(--wine)}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
+.box{position:relative;aspect-ratio:1/1.08;border-radius:12px;perspective:600px;padding:0}
+.box .inside{position:absolute;inset:0;border-radius:12px;background:var(--paper);border:1px solid var(--line);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.box .inside .n{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--wine-d)}
+.box .inside svg{width:14px;height:14px;color:var(--gold)}
+.box.done .inside{background:var(--rose-l);border-color:var(--rose)}
+.box.done .inside svg{color:var(--wine)}
+.box .door{position:absolute;inset:0;border-radius:12px;transform-origin:left center;transition:transform .55s cubic-bezier(.5,.1,.3,1),opacity .55s;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#F8EEDD;
+  box-shadow:inset 0 0 0 1px rgba(184,146,90,.55),inset 0 0 0 4px rgba(0,0,0,.06),0 2px 6px rgba(60,30,30,.12);backface-visibility:hidden}
+.box .door .n{font-family:var(--serif);font-size:21px;font-weight:500;line-height:1}
+.box .door svg{width:13px;height:13px;opacity:.85;color:#E7C99A}
+.c0 .door{background:linear-gradient(160deg,#8A3444,var(--wine-d))}
+.c1 .door{background:linear-gradient(160deg,#3A5744,#243729)}
+.c2 .door{background:linear-gradient(160deg,#B9746F,#94524F)}
+.box.open .door,.box.done .door{transform:rotateY(-105deg);opacity:0;pointer-events:none}
+.box.locked .door{filter:saturate(.55) brightness(1.05);opacity:.75}
+.box.today .door::after,.box.today .inside::after{content:'';position:absolute;inset:-4px;border-radius:15px;border:2px solid var(--gold)}
+.box .lock{position:absolute;top:6px;right:6px;width:11px;height:11px;opacity:.8}
+.box:active .door{transform:scale(.96)}
+.box.wide{grid-column:1/-1;aspect-ratio:auto;height:78px}
+.box.wide .door,.box.wide .inside{flex-direction:row;gap:12px}
+.box.wide .door .n,.box.wide .inside .n{font-size:26px}
+.box.wide .lbl{font-family:var(--serif);font-style:italic;font-size:17px}
+.box.wide .door{transform-origin:center top}
+.box.wide.open .door,.box.wide.done .door{transform:rotateX(100deg)}
+.box.wide .inside .lbl{color:var(--wine-d)}
+
+.foot{text-align:center;color:var(--muted);font-size:13px;margin-top:22px;font-style:italic;font-family:var(--serif)}
+
+/* sheet */
+.sheet{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;background:var(--cream);transform:translateY(100%);transition:transform .38s cubic-bezier(.3,.8,.3,1),visibility 0s .38s;overflow:hidden}
+.sheet.show{transition:transform .38s cubic-bezier(.3,.8,.3,1),visibility 0s}
+.sheet{visibility:hidden}.sheet.show{transform:none;visibility:visible}
+.sheet .bar-top{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(var(--st) + 10px) 14px 10px;border-bottom:1px solid var(--line);background:rgba(246,239,228,.94);backdrop-filter:blur(8px)}
+.sheet .bar-top .mid{font-size:13px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:500;text-align:center}
+.sheet .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sheet .body{max-width:560px;margin:0 auto;padding:22px 20px calc(var(--sb) + 40px)}
+.navs{display:flex;gap:4px}
+
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:99px}
+.cat-recuerdos{background:#F1E3CC;color:#7A5A2A}
+.cat-emocion{background:var(--rose-l);color:var(--wine)}
+.cat-intimidad{background:#EBCFD3;color:#6E1F33}
+.cat-reflexion{background:var(--green-l);color:var(--green)}
+.cat-futuro{background:#E3E1EE;color:#4A436E}
+.cat-reto{background:#F3DDC4;color:#8A4A1E}
+.daynum{font-family:var(--serif);font-size:15px;color:var(--muted);margin:16px 0 2px;font-style:italic}
+.dtitle{font-family:var(--serif);font-weight:500;font-size:32px;line-height:1.12;margin:0;color:var(--wine-d)}
+.dq{font-family:var(--serif);font-size:22px;line-height:1.38;margin:16px 0 0;color:var(--ink)}
+.dq.blur{filter:blur(7px);user-select:none;cursor:pointer}
+.reveal-hint{font-size:13px;color:var(--muted);margin-top:6px}
+.reveal-in{animation:rv .7s ease both}
+@keyframes rv{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.seg{display:flex;background:var(--beige);border-radius:12px;padding:3px;margin:24px 0 10px;gap:2px}
+.seg button{flex:1;padding:8px 4px;border-radius:9px;font-size:13px;font-weight:500;color:var(--muted)}
+.seg button.on{background:var(--paper);color:var(--wine-d);box-shadow:0 1px 3px rgba(60,30,30,.1)}
+.modehelp{font-size:13px;color:var(--muted);margin:0 0 14px}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:12px}
+.card label{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;color:var(--wine);margin-bottom:6px}
+.card textarea{width:100%;min-height:96px;border:0;background:transparent;resize:vertical;outline:none;font-size:16px;line-height:1.5}
+.card textarea.hid{filter:blur(6px);pointer-events:none}
+.mini{font-size:12px;font-weight:500;color:var(--muted);display:inline-flex;gap:4px;align-items:center;padding:4px 8px;border-radius:8px;background:var(--cream)}
+.saved{font-size:12px;color:var(--muted);height:16px;text-align:right;margin:-6px 2px 8px}
+
+.primary{width:100%;padding:15px;border-radius:14px;background:var(--wine);color:#FBF2E6;font-weight:600;font-size:16px;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s}
+.primary.isdone{background:var(--green)}
+.primary:active{transform:scale(.99)}
+.secondary{width:100%;padding:13px;border-radius:14px;border:1px solid var(--line);background:var(--paper);font-weight:500;margin-top:8px}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.actions button{padding:11px 4px;border-radius:12px;border:1px solid var(--line);background:var(--paper);font-size:13px;color:var(--wine-d);display:flex;flex-direction:column;align-items:center;gap:4px}
+.actions svg{width:18px;height:18px}
+.gentle{text-align:center;font-family:var(--serif);font-style:italic;color:var(--muted);font-size:14px;margin-top:22px}
+
+/* capsule */
+.capsule{margin-top:26px;padding:20px 18px;border-radius:18px;background:linear-gradient(170deg,#FFFBF4,#F3E7D5);border:1px solid var(--line);position:relative;overflow:hidden}
+.capsule h3{font-family:var(--serif);font-weight:500;font-size:22px;margin:0 0 4px;color:var(--wine-d)}
+.capsule p{margin:0 0 12px;color:var(--muted);font-size:14px}
+.capsule textarea{width:100%;min-height:220px;border:0;outline:none;resize:vertical;font-family:var(--serif);font-size:18px;line-height:1.6;
+  background:repeating-linear-gradient(transparent 0 28px,rgba(184,146,90,.22) 28px 29px);background-attachment:local;padding-top:2px}
+.env{display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 0 4px}
+.env svg{width:150px;height:110px}
+.env .when{font-family:var(--serif);font-size:19px;color:var(--wine-d);margin:10px 0 2px}
+.env .cd{font-size:14px;color:var(--muted)}
+.sealedtxt{font-family:var(--serif);font-size:18px;line-height:1.6;white-space:pre-wrap;margin:6px 0 0}
+
+/* summary & settings */
+.page h2{font-family:var(--serif);font-weight:500;font-size:30px;margin:0;color:var(--wine-d)}
+.page .lead{color:var(--muted);margin:6px 0 18px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.stat b{display:block;font-family:var(--serif);font-size:28px;font-weight:600;color:var(--wine)}
+.stat span{font-size:12px;color:var(--muted)}
+.mem{border-left:2px solid var(--rose);padding:2px 0 2px 14px;margin:0 0 20px}
+.mem .h{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.mem .t{font-family:var(--serif);font-size:19px;color:var(--wine-d);margin:2px 0 6px}
+.mem .who{font-size:13px;font-weight:600;color:var(--wine);margin-top:6px}
+.mem .txt{white-space:pre-wrap;font-size:15px}
+.empty{color:var(--muted);font-style:italic;font-family:var(--serif);text-align:center;padding:24px 0}
+.sect{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:26px 0 10px}
+.field{display:block;margin-bottom:12px}
+.field span{display:block;font-size:13px;font-weight:600;color:var(--wine);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--paper);font-size:16px;outline:none}
+.field textarea{min-height:110px;resize:vertical}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--rose)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--paper);margin-bottom:8px;text-align:left;width:100%}
+.opt.on{border-color:var(--wine);box-shadow:0 0 0 1px var(--wine)}
+.opt .dot{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid var(--line);margin-top:2px}
+.opt.on .dot{border:5px solid var(--wine)}
+.opt b{display:block;font-weight:600}
+.opt small{color:var(--muted);font-size:13px}
+.switch{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--paper);width:100%;text-align:left}
+.switch .k{flex:none;width:46px;height:28px;border-radius:99px;background:var(--beige);position:relative;transition:background .2s}
+.switch .k::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s}
+.switch.on .k{background:var(--wine)}
+.switch.on .k::after{transform:translateX(18px)}
+.note{font-size:14px;color:var(--muted);background:var(--paper);border:1px dashed var(--line);border-radius:14px;padding:12px 14px}
+.danger{color:#9B2C2C;border-color:#E9C4C0}
+
+/* modal + toast */
+.modal{position:fixed;inset:0;z-index:40;background:rgba(56,40,42,.38);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal.show{opacity:1;pointer-events:auto}
+.modal .mbox{width:100%;max-width:560px;background:var(--cream);border-radius:22px 22px 0 0;padding:22px 20px calc(var(--sb) + 22px);transform:translateY(30px);transition:transform .3s;max-height:88vh;overflow-y:auto}
+.modal.show .mbox{transform:none}
+.mbox h3{font-family:var(--serif);font-weight:500;font-size:24px;margin:0 0 8px;color:var(--wine-d)}
+.mbox p{color:var(--muted);margin:0 0 14px}
+.mrow{display:flex;gap:8px;margin-top:12px}
+.mrow button{flex:1;margin:0}
+.toast{position:fixed;left:50%;bottom:calc(var(--sb) + 24px);transform:translate(-50%,20px);background:var(--ink);color:#F8EEDD;padding:11px 18px;border-radius:99px;font-size:14px;z-index:50;opacity:0;transition:all .3s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.warn{background:#F6E1D6;color:#7A3A22;border-radius:12px;padding:10px 12px;font-size:13px;margin-top:12px}
+
+.welcome{text-align:center;padding-top:10px}
+.welcome .big{font-family:var(--serif);font-style:italic;font-size:44px;line-height:1.05;color:var(--wine-d);margin:18px 0 10px}
+.welcome p{color:var(--muted);margin:0 auto 22px;max-width:380px}
+.heartline{width:64px;height:64px;margin:0 auto;color:var(--wine)}
+@media (min-width:500px){.grid{gap:12px}.box .door .n,.box .inside .n{font-size:24px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<section class="sheet" id="sheet" aria-modal="true" role="dialog">
+  <div class="bar-top" id="sheetTop"></div>
+  <div class="scroll" id="sheetScroll"><div class="body" id="sheetBody"></div></div>
+</section>
+
+<div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- contenido ---------- */
+const CATS = {
+  recuerdos:{l:'Recuerdos', i:'star'},
+  emocion:{l:'Conexión', i:'heart'},
+  intimidad:{l:'Intimidad', i:'flame'},
+  reflexion:{l:'Reflexión', i:'leaf'},
+  futuro:{l:'Futuro', i:'spark'},
+  reto:{l:'Reto', i:'gift'}
+};
+const MODES = {
+  juntos:{l:'Juntos', h:'Abrid la pregunta y hablad. Si queréis, apuntad lo que no queráis olvidar.'},
+  individual:{l:'Cada uno', h:'Cada uno escribe su respuesta sin mirar. Después, desvelad y comparad.'},
+  conjunta:{l:'Conjunta', h:'Escribid juntos una sola respuesta o recuerdo.'},
+  reto:{l:'Reto', h:'Aquí no hay que responder: hay que hacerlo. Apuntad cómo fue, si os apetece.'}
+};
+const DAYS = [
+ ['Nuestro día favorito','¿Qué día que pasamos juntos repetirías exactamente igual?','recuerdos','juntos'],
+ ['Nuestro sexo favorito','¿Cuál ha sido nuestro encuentro sexual favorito y qué lo hizo especial?','intimidad','juntos'],
+ ['Nuestra comida favorita','¿Cuál ha sido la mejor comida o cena que hemos compartido?','recuerdos','juntos'],
+ ['Nuestro desayuno favorito','¿Qué desayuno juntos recuerdas con más cariño?','recuerdos','juntos'],
+ ['La mayor carcajada','¿Cuál fue el momento en el que más nos reímos?','recuerdos','juntos'],
+ ['Una primera vez','¿Qué primera vez que vivimos juntos te hizo especial ilusión?','recuerdos','juntos'],
+ ['Un detalle inolvidable','¿Qué pequeño gesto mío te hizo sentir especialmente querido/a?','emocion','individual'],
+ ['Nuestra mejor aventura','¿Qué viaje, excursión o plan improvisado recuerdas con más cariño?','recuerdos','juntos'],
+ ['Lo que descubrí de ti','¿Qué has descubierto de mí este año que no esperabas?','emocion','individual'],
+ ['El beso que recuerdas','¿Hay algún beso nuestro que recuerdes especialmente?','intimidad','juntos'],
+ ['Nuestro momento más absurdo','Contemos una anécdota nuestra que todavía nos haga reír.','recuerdos','conjunta'],
+ ['Lo que más me atrae','Dime tres cosas de mí que te resulten especialmente atractivas, físicas o no.','intimidad','individual'],
+ ['Un momento cotidiano','¿Qué momento aparentemente normal de nuestra rutina te hace feliz?','emocion','juntos'],
+ ['Una canción nuestra','Elegimos una canción que represente este año juntos y explicamos por qué.','reto','reto'],
+ ['Cuando me sentí querido/a','¿En qué momento te sentiste especialmente cuidado/a por mí?','emocion','individual'],
+ ['Nuestra mejor conversación','¿Qué conversación nuestra te marcó o te hizo sentir más cerca de mí?','emocion','juntos'],
+ ['Una fantasía pendiente','¿Qué te gustaría que explorásemos o probásemos en nuestra intimidad?','intimidad','individual'],
+ ['El plan que repetiría','¿Qué plan sencillo te gustaría convertir en una tradición nuestra?','futuro','juntos'],
+ ['Algo que hemos superado','¿Qué situación difícil hemos gestionado bien como pareja?','reflexion','juntos'],
+ ['Algo que haría diferente','¿Hay alguna situación en la que te habría gustado actuar de otra manera?','reflexion','juntos'],
+ ['Un cumplido inesperado','Dime algo que admires de mí y que quizá nunca me hayas dicho.','emocion','individual'],
+ ['La foto del año','Elegimos cada uno nuestra foto favorita juntos y contamos qué significa.','reto','reto'],
+ ['Lo que me enseñaste','¿Qué has aprendido de mí o gracias a nuestra relación?','emocion','individual'],
+ ['Nuestro regalo invisible','Regalémonos algo que no cueste dinero: una carta, un masaje, un gesto…','reto','reto'],
+ ['Nuestro recuerdo navideño','¿Qué es lo que más te gusta de compartir estas fechas conmigo?','emocion','juntos'],
+ ['Lo que quiero cuidar','¿Qué aspecto de nuestra relación te gustaría que protegiésemos especialmente?','reflexion','juntos'],
+ ['Una sorpresa pendiente','Cada uno propone una experiencia nueva que le gustaría vivir con el otro.','futuro','individual'],
+ ['Más y menos','¿Qué te gustaría que hiciéramos más y qué te gustaría que hiciéramos menos?','reflexion','individual'],
+ ['Nuestro mayor orgullo','¿De qué te sientes más orgulloso/a de nosotros como pareja?','reflexion','juntos'],
+ ['Tres deseos para nosotros','Escribimos tres cosas que nos gustaría vivir juntos el próximo año.','futuro','conjunta'],
+ ['La cápsula del tiempo','Escribimos una carta para nosotros mismos que abriremos el próximo 31 de diciembre.','futuro','conjunta']
+].map(([t,q,c,m],i)=>({n:i+1,t,q,c,m}));
+
+const BANK = {
+ recuerdos:[
+  ['Lo que más nos ha reído','¿Cuál ha sido el momento en el que más nos hemos reído este año?'],
+  ['La aventura que repetiría','¿Qué viaje o aventura repetirías exactamente igual?'],
+  ['Pequeño gran momento','¿Qué pequeño momento cotidiano recuerdas con cariño?'],
+  ['Nuestro lugar','¿Qué sitio sientes que ya es “nuestro” y por qué?'],
+  ['La foto mental','Si pudieras guardar un solo instante de este año como una foto, ¿cuál sería?'],
+  ['El mejor finde','¿Cuál ha sido nuestro mejor fin de semana juntos?']],
+ emocion:[
+  ['Lo que admiro','¿Qué admiras de mí y quizá nunca me hayas dicho?'],
+  ['Más cerca','¿Qué conversación nuestra te hizo sentir más cerca de mí?'],
+  ['Cuidado','¿En qué momento te sentiste más cuidado/a por mí?'],
+  ['Gracias por…','Dime algo concreto que te gustaría agradecerme de este año.'],
+  ['Mi refugio','¿Cuándo sientes que soy tu lugar seguro?'],
+  ['Lo que te digo poco','¿Qué te gustaría que te dijera más a menudo?']],
+ intimidad:[
+  ['Lo que me atrae','¿Qué es lo que más te atrae de mí?'],
+  ['Sentirme deseado/a','¿Qué te hace sentir especialmente deseado/a por mí?'],
+  ['Algo por explorar','¿Qué fantasía o experiencia te gustaría explorar conmigo?'],
+  ['Un roce','¿Qué caricia o gesto pequeño mío te enciende más de lo que crees?'],
+  ['La noche perfecta','Describe cómo sería para ti una noche perfecta los dos solos.']],
+ reflexion:[
+  ['De otra manera','¿Hay algo que te habría gustado que hiciéramos de otra manera?'],
+  ['Cuidar más','¿Qué aspecto de nuestra relación te gustaría que cuidásemos más?'],
+  ['Orgullo','¿De qué te sientes más orgulloso/a de nosotros?'],
+  ['Hemos crecido','¿En qué sientes que hemos crecido como pareja este año?'],
+  ['Lo que aprendimos','¿Qué hemos aprendido de nuestras discusiones?']],
+ futuro:[
+  ['Algo nuevo','¿Qué experiencia nueva te gustaría vivir conmigo?'],
+  ['Tres cosas','¿Qué tres cosas te gustaría que viviéramos juntos el próximo año?'],
+  ['Ilusión','¿Qué te ilusiona de nuestro futuro?'],
+  ['Una tradición','¿Qué tradición nueva te gustaría que empezáramos este invierno?'],
+  ['Dentro de cinco años','¿Cómo te imaginas un domingo cualquiera nuestro dentro de cinco años?']],
+ reto:[
+  ['Una sorpresa pequeña','Preparad cada uno una sorpresa pequeña para el otro antes de que acabe el día.'],
+  ['Carta corta','Escribíos una nota de cinco líneas y leedla en voz alta.'],
+  ['Cena a ciegas','Uno elige la cena y el otro no sabe nada hasta sentarse.'],
+  ['Paseo sin móvil','Salid a dar un paseo de 30 minutos sin móviles.'],
+  ['Baile en el salón','Poned una canción vuestra y bailadla entera, sin excusas.']]
+};
+
+/* ---------- iconos ---------- */
+const IC = {
+ gift:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="11.5" rx="1.5"/><path d="M2.5 9h19M12 9v11.5M12 9c-1.5-3.5-6-4.5-6-1.8C6 9 12 9 12 9Zm0 0c1.5-3.5 6-4.5 6-1.8C18 9 12 9 12 9Z"/></svg>',
+ heart:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.5s-7.5-4.6-9.2-9.3C1.6 7.8 3.9 4.5 7.3 4.5c2 0 3.4 1.1 4.7 2.8 1.3-1.7 2.7-2.8 4.7-2.8 3.4 0 5.7 3.3 4.5 6.7C19.5 15.9 12 20.5 12 20.5Z"/></svg>',
+ star:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.8 2.6 6 6.4.5-4.9 4.2 1.5 6.3L12 16.4l-5.6 3.4 1.5-6.3L3 9.3l6.4-.5Z"/></svg>',
+ spark:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c.6 4.6 2.4 6.9 7 7.5v1c-4.6.6-6.4 2.9-7 7.5h-1c-.6-4.6-2.4-6.9-7-7.5v-1C8.6 8.9 10.4 6.6 11 2Z" transform="translate(.5 1.5)"/></svg>',
+ flame:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c-4 0-7-2.7-7-6.6 0-3.3 2.2-5.3 3.6-7 .4 1.6 1.2 2.6 2.4 3C10.5 7.6 12 4.6 15 2c-.3 3 .7 5 2.2 7 1.1 1.5 1.8 3.2 1.8 5.4C19 18.9 16 22 12 22Z"/></svg>',
+ leaf:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 3.5C11 3.5 4.5 7.5 4.5 14.5c0 1.6.4 3 1.1 4.1C7 13.5 10.5 10.5 15 9c-4 2.3-6.7 5.6-8.2 10.4 1.1.8 2.6 1.1 4.2 1.1C18 20.5 20 12 20 3.5Z"/></svg>',
+ lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+ book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5Z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="m12 7.5.9 1.9 2 .2-1.5 1.3.5 2-1.9-1.1-1.9 1.1.5-2-1.5-1.3 2-.2Z" fill="currentColor" stroke="none"/></svg>',
+ gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>',
+ x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+ l:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg>',
+ r:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>',
+ edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg>',
+ swap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>',
+ copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>',
+ check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+ eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>'
+};
+const DOOR_ICONS=['star','heart','gift','spark'];
+
+/* ---------- estado ---------- */
+const KEY='nuestro-adviento-v1';
+let canStore=true;
+function defaultYear(){const d=new Date();return d.getMonth()===0&&d.getDate()<15?d.getFullYear()-1:d.getFullYear();}
+function fresh(){return {v:1,year:defaultYear(),names:{a:'',b:''},unlock:'libre',discreto:false,welcomed:false,days:{},capsule:{text:'',sealed:false,sealedAt:null,openedEarly:false}};}
+let S=fresh();
+try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(fresh(),JSON.parse(raw));localStorage.setItem(KEY+'-t','1');localStorage.removeItem(KEY+'-t');}catch(e){canStore=false;}
+let saveT;
+function save(quiet){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(S));if(!quiet)flashSaved();}catch(e){canStore=false;}},350);}
+function D(n){return S.days[n]||(S.days[n]={opened:false,done:false,mode:null,notes:{shared:'',a:'',b:''},hide:{a:false,b:false},custom:null,swapIdx:0});}
+function content(n){const base=DAYS[n-1];const c=D(n).custom;return c?{...base,...c}:base;}
+function modeOf(n){return D(n).mode||DAYS[n-1].m;}
+const nameA=()=>S.names.a.trim()||'Persona 1';
+const nameB=()=>S.names.b.trim()||'Persona 2';
+const MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const DOW=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+function dateOf(n){return new Date(S.year,11,n);}
+function isUnlocked(n){return S.unlock==='libre'||D(n).opened||new Date()>=dateOf(n);}
+function isToday(n){const t=new Date();return t.getFullYear()===S.year&&t.getMonth()===11&&t.getDate()===n;}
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function counts(){let o=0,d=0;for(let n=1;n<=31;n++){if(S.days[n]?.opened)o++;if(S.days[n]?.done)d++;}return {o,d};}
+
+/* ---------- UI helpers ---------- */
+const $=s=>document.querySelector(s);
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2300);}
+function flashSaved(){const el=$('#savedNote');if(el){el.textContent='Guardado en este móvil';clearTimeout(el._t);el._t=setTimeout(()=>el.textContent='',1600);}}
+function modal(html,onMount){$('#mbox').innerHTML=html;$('#modal').classList.add('show');onMount&&onMount($('#mbox'));}
+function closeModal(){$('#modal').classList.remove('show');}
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
+function confirmBox(title,text,okLabel,onOk,danger){
+  modal(`<h3>${title}</h3><p>${text}</p><div class="mrow"><button class="secondary" data-c>Cancelar</button><button class="primary" style="${danger?'background:#9B2C2C':''}" data-ok>${okLabel}</button></div>`,m=>{
+    m.querySelector('[data-c]').onclick=closeModal;
+    m.querySelector('[data-ok]').onclick=()=>{closeModal();onOk();};
+  });
+}
+async function copyText(txt,msg){
+  try{await navigator.clipboard.writeText(txt);toast(msg||'Copiado');}
+  catch(e){modal(`<h3>Copiar</h3><p>Tu navegador no deja copiar automáticamente. Mantén pulsado el texto para copiarlo.</p><label class="field"><textarea readonly style="min-height:180px">${esc(txt)}</textarea></label><button class="secondary" data-c>Cerrar</button>`,m=>{m.querySelector('[data-c]').onclick=closeModal;const ta=m.querySelector('textarea');ta.focus();ta.select();});}
+}
+
+/* ---------- pantalla principal ---------- */
+function renderHome(){
+  if(!S.welcomed){renderWelcome();return;}
+  const {o,d}=counts();
+  const names=(S.names.a.trim()&&S.names.b.trim())?`${esc(S.names.a)} & ${esc(S.names.b)}`:'31 días para cerrar el año juntos';
+  let cells='';
+  for(let n=1;n<=31;n++){
+    const st=S.days[n]||{};const un=isUnlocked(n);const c=content(n);
+    const cls=['box','c'+((n*7)%3)];
+    if(st.done)cls.push('done');else if(st.opened)cls.push('open');
+    if(!un)cls.push('locked');if(isToday(n))cls.push('today');if(n===31)cls.push('wide');
+    const di=IC[DOOR_ICONS[n%4]];
+    const inIcon=st.done?IC.check:IC[CATS[c.c].i];
+    const lbl=n===31?`<span class="lbl">${st.opened||st.done?'Nuestra cápsula del tiempo':'La última puerta'}</span>`:'';
+    cells+=`<button class="${cls.join(' ')}" data-day="${n}" aria-label="Día ${n}${st.done?', completado':st.opened?', descubierto':''}">
+      <span class="inside"><span class="n">${n}</span>${lbl}${inIcon}</span>
+      <span class="door"><span class="n">${n}</span>${lbl}${n===31?IC.gift:di}${!un?`<span class="lock">${IC.lock}</span>`:''}</span>
+    </button>`;
+  }
+  $('#app').innerHTML=`
+   <header class="top">
+     <div><div class="eyebrow">Diciembre ${S.year}</div><h1>Nuestro <span>Adviento</span></h1></div>
+     <div class="icons"><button class="ibtn" data-go="summary" aria-label="Nuestro año">${IC.book}</button><button class="ibtn" data-go="settings" aria-label="Ajustes">${IC.gear}</button></div>
+   </header>
+   <p class="sub">${names}</p>
+   <div class="prog">
+     <div class="prog-row"><b>${o} de 31 días descubiertos</b><small>${d} ${d===1?'completado':'completados'}</small></div>
+     <div class="bar"><i class="o" style="width:${o/31*100}%"></i><i class="d" style="width:${d/31*100}%"></i></div>
+     ${!canStore?'<div class="warn">Este navegador no permite guardar (¿modo privado?). Lo que hagáis se perderá al cerrar.</div>':''}
+   </div>
+   <div class="grid">${cells}</div>
+   <p class="foot">Sin prisa y sin deberes. Un ratito al día, a vuestro ritmo.</p>`;
+}
+
+function renderWelcome(){
+  $('#app').innerHTML=`<div class="welcome">
+    <div class="heartline">${IC.heart}</div>
+    <div class="big">31 días<br>juntos</div>
+    <p>Cada día de diciembre, una puerta: un recuerdo, una pregunta, algo íntimo o un pequeño reto. Para recordar el año y empezar a soñar el siguiente.</p>
+    <div style="text-align:left">
+      <div class="row2">
+        <label class="field"><span>Uno</span><input id="wa" placeholder="Nombre" value="${esc(S.names.a)}" autocomplete="off"></label>
+        <label class="field"><span>Otro</span><input id="wb" placeholder="Nombre" value="${esc(S.names.b)}" autocomplete="off"></label>
+      </div>
+      <div class="sect" style="margin-top:8px">¿Cómo queréis abrir las puertas?</div>
+      ${unlockOpts()}
+    </div>
+    <button class="primary" id="wgo" style="margin-top:18px">Empezar nuestro Adviento</button>
+    <p style="font-size:13px;margin-top:16px">Todo se guarda solo en este móvil. Nada sale de aquí.</p>
+  </div>`;
+}
+function unlockOpts(){
+  return `<button class="opt ${S.unlock==='libre'?'on':''}" data-unlock="libre"><span class="dot"></span><span><b>A nuestro ritmo</b><small>Todas las puertas abiertas. Elegís cuándo y cuál.</small></span></button>
+  <button class="opt ${S.unlock==='diario'?'on':''}" data-unlock="diario"><span class="dot"></span><span><b>Una cada día</b><small>Cada puerta se abre en su fecha de diciembre, como un calendario de verdad.</small></span></button>`;
+}
+
+/* ---------- día ---------- */
+let current=null;
+function openDay(n,fromBox){
+  if(!isUnlocked(n)){const dt=dateOf(n);toast(`Esta puerta se abre el ${n} de diciembre`);return;}
+  const st=D(n);const first=!st.opened;
+  const go=()=>{st.opened=true;save(true);current=n;renderDay(first);$('#sheet').classList.add('show');$('#sheetScroll').scrollTop=0;};
+  if(first&&fromBox){fromBox.classList.add('open');setTimeout(go,480);}else go();
+}
+function closeSheet(){$('#sheet').classList.remove('show');current=null;renderHome();}
+
+function renderDay(firstReveal){
+  const n=current,st=D(n),c=content(n),mode=modeOf(n),dt=dateOf(n);
+  $('#sheetTop').innerHTML=`<button class="ibtn" data-close aria-label="Cerrar">${IC.x}</button>
+    <div class="mid">Día ${n} · ${DOW[dt.getDay()]} ${n} dic</div>
+    <div class="navs"><button class="ibtn" data-prev ${n===1?'disabled style="opacity:.35"':''} aria-label="Día anterior">${IC.l}</button><button class="ibtn" data-next ${n===31?'disabled style="opacity:.35"':''} aria-label="Día siguiente">${IC.r}</button></div>`;
+  const blur=S.discreto&&c.c==='intimidad'&&!st._shown;
+  let notes='';
+  if(mode==='individual'){
+    notes=['a','b'].map(k=>`<div class="card"><label>${esc(k==='a'?nameA():nameB())}<button class="mini" data-hide="${k}">${IC.eye}${st.hide[k]?'Mostrar':'Ocultar'}</button></label>
+      <textarea data-note="${k}" class="${st.hide[k]?'hid':''}" placeholder="${st.hide[k]?'':'Tu respuesta… (pulsa Ocultar antes de pasar el móvil)'}">${esc(st.notes[k])}</textarea></div>`).join('');
+  }else{
+    const ph={juntos:'Lo que no queremos olvidar de esta conversación…',conjunta:'Nuestra respuesta…',reto:'¿Cómo fue? ¿Qué canción, qué foto, qué regalo?'}[mode];
+    const lb={juntos:'Notas',conjunta:'Nuestra respuesta',reto:'Cómo fue'}[mode];
+    notes=`<div class="card"><label>${lb}</label><textarea data-note="shared" placeholder="${ph}">${esc(st.notes.shared)}</textarea></div>`;
+  }
+  $('#sheetBody').innerHTML=`<div class="${firstReveal?'reveal-in':''}">
+    <span class="chip cat-${c.c}">${CATS[c.c].l}</span>
+    <div class="daynum">${n} de diciembre</div>
+    <h2 class="dtitle">${esc(c.t)}</h2>
+    <p class="dq ${blur?'blur':''}" ${blur?'data-unblur':''}>${esc(c.q)}</p>
+    ${blur?'<div class="reveal-hint">Modo discreto · toca para ver</div>':''}
+    </div>
+    ${n===31?'':`<div class="seg">${Object.entries(MODES).map(([k,v])=>`<button data-mode="${k}" class="${k===mode?'on':''}">${v.l}</button>`).join('')}</div>
+    <p class="modehelp">${MODES[mode].h}</p>
+    ${notes}`}
+    <div class="saved" id="savedNote"></div>
+    ${n===31?capsuleHTML():''}
+    <button class="primary ${st.done?'isdone':''}" data-done>${st.done?IC.check+' Completado':'Marcar como completado'}</button>
+    <div class="actions">
+      <button data-edit>${IC.edit}Editar</button>
+      <button data-swap>${IC.swap}Cambiar</button>
+      <button data-share>${IC.copy}Copiar</button>
+    </div>
+    <p class="gentle">${st.done?'Uno más para vuestra colección.':'Sin prisa. Podéis volver a este día cuando queráis.'}</p>`;
+}
+
+function capsuleHTML(){
+  const cp=S.capsule,openDate=new Date(S.year+1,11,31),now=new Date();
+  if(!cp.sealed) return `<div class="capsule"><h3>Carta para nosotros de dentro de un año</h3>
+    <p>Escribidla juntos. Al sellarla, quedará guardada hasta el 31 de diciembre de ${S.year+1}.</p>
+    <textarea data-capsule placeholder="Queridos nosotros del próximo diciembre…">${esc(cp.text)}</textarea>
+    <button class="secondary" data-seal style="margin-top:10px">Sellar la cápsula</button></div>`;
+  const ready=now>=openDate||cp.openedEarly;
+  const days=Math.ceil((openDate-now)/864e5);
+  return `<div class="capsule"><div class="env">${envelopeSVG()}
+    <div class="when">${ready?'La cápsula está abierta':'Se abrirá el 31 de diciembre de '+(S.year+1)}</div>
+    <div class="cd">${ready?'Sellada el '+fmtDate(cp.sealedAt):'Faltan '+days+' días · sellada el '+fmtDate(cp.sealedAt)}</div></div>
+    ${ready?`<div class="sealedtxt">${esc(cp.text)||'<i>(La carta está vacía)</i>'}</div>`:`<button class="secondary" data-early style="margin-top:14px">Abrir antes de tiempo</button>`}
+  </div>`;
+}
+function fmtDate(iso){if(!iso)return '—';const d=new Date(iso);return `${d.getDate()} de ${MES[d.getMonth()]} de ${d.getFullYear()}`;}
+function envelopeSVG(){return `<svg viewBox="0 0 150 110"><rect x="8" y="16" width="134" height="86" rx="6" fill="#F7EDDD" stroke="#D9C5A6"/><path d="M8 22 75 66l67-44" fill="none" stroke="#D9C5A6" stroke-width="1.5"/><circle cx="75" cy="64" r="15" fill="#7B2D3B"/><circle cx="75" cy="64" r="11" fill="none" stroke="#A54A5A" stroke-width="1.5"/><path d="M75 70.5s-6-3.7-6-7.4c0-2 1.4-3.3 3-3.3 1.3 0 2.2.8 3 1.9.8-1.1 1.7-1.9 3-1.9 1.6 0 3 1.3 3 3.3 0 3.7-6 7.4-6 7.4Z" fill="#E7C99A"/></svg>`;}
+
+/* ---------- resumen ---------- */
+function renderSummary(){
+  const {o,d}=counts();let notes=0,items='';
+  for(let n=1;n<=31;n++){
+    const st=S.days[n];if(!st)continue;const c=content(n);
+    const parts=[];
+    if(st.notes.shared.trim())parts.push(['',st.notes.shared]);
+    if(st.notes.a.trim())parts.push([nameA(),st.notes.a]);
+    if(st.notes.b.trim())parts.push([nameB(),st.notes.b]);
+    if(!parts.length)continue;notes++;
+    items+=`<div class="mem"><div class="h">Día ${n} · ${CATS[c.c].l}</div><div class="t">${esc(c.t)}</div>${parts.map(([w,t])=>`${w?`<div class="who">${esc(w)}</div>`:''}<div class="txt">${esc(t)}</div>`).join('')}</div>`;
+  }
+  const cp=S.capsule;
+  const capLine=cp.sealed?`Cápsula sellada el ${fmtDate(cp.sealedAt)}. Se abrirá el 31 de diciembre de ${S.year+1}.`:(cp.text.trim()?'La carta del día 31 está empezada, pero aún no la habéis sellado.':'La carta del día 31 está por escribir.');
+  return `<div class="page"><h2>Nuestro ${S.year}</h2>
+    <p class="lead">${d===31?'Lo habéis completado entero. Qué bonito cierre de año.':'Todo lo que habéis ido guardando, en un solo sitio.'}</p>
+    <div class="stats"><div class="stat"><b>${o}</b><span>descubiertos</span></div><div class="stat"><b>${d}</b><span>completados</span></div><div class="stat"><b>${notes}</b><span>recuerdos</span></div></div>
+    <div class="note" style="margin-bottom:22px"><b style="color:var(--wine-d)">Cápsula del tiempo.</b> ${capLine}</div>
+    ${items||'<div class="empty">Aún no hay recuerdos guardados. Abrid una puerta y empezad.</div>'}
+    ${items?`<button class="secondary" data-copyall>Copiar todos los recuerdos</button>`:''}</div>`;
+}
+function allText(){
+  let out=`NUESTRO ADVIENTO ${S.year}\n\n`;
+  for(let n=1;n<=31;n++){const st=S.days[n];if(!st)continue;const c=content(n);
+    const p=[];if(st.notes.shared.trim())p.push(st.notes.shared);if(st.notes.a.trim())p.push(nameA()+': '+st.notes.a);if(st.notes.b.trim())p.push(nameB()+': '+st.notes.b);
+    if(p.length)out+=`Día ${n} — ${c.t}\n${c.q}\n${p.join('\n')}\n\n`;}
+  return out.trim();
+}
+
+/* ---------- ajustes ---------- */
+function renderSettings(){
+  return `<div class="page"><h2>Ajustes</h2><p class="lead">Hacedlo vuestro.</p>
+   <div class="row2"><label class="field"><span>Uno</span><input data-name="a" value="${esc(S.names.a)}" placeholder="Nombre"></label>
+   <label class="field"><span>Otro</span><input data-name="b" value="${esc(S.names.b)}" placeholder="Nombre"></label></div>
+   <label class="field"><span>Año del calendario</span><select data-year>${[S.year-1,S.year,S.year+1].filter((v,i,a)=>a.indexOf(v)===i).map(y=>`<option ${y===S.year?'selected':''}>${y}</option>`).join('')}</select></label>
+   <div class="sect">Apertura de puertas</div>${unlockOpts()}
+   <div class="sect">Privacidad</div>
+   <button class="switch ${S.discreto?'on':''}" data-discreto><span><b>Modo discreto</b><br><small style="color:var(--muted)">Las preguntas íntimas aparecen difuminadas hasta que las tocáis.</small></span><span class="k"></span></button>
+   <div class="note" style="margin-top:10px">Todo lo que escribís se guarda solo en este navegador, en este móvil. No hay cuentas, no se envía a ningún servidor y nadie más lo ve. Si borráis los datos del navegador o cambiáis de móvil, se pierde: haced una copia de seguridad de vez en cuando.</div>
+   <div class="sect">Copia de seguridad</div>
+   <button class="secondary" data-backup>Copiar copia de seguridad</button>
+   <button class="secondary" data-restore>Restaurar desde una copia</button>
+   <div class="sect">Empezar de cero</div>
+   <button class="secondary danger" data-reset>Borrar todas las respuestas y el progreso</button>
+  </div>`;
+}
+
+/* ---------- páginas en hoja ---------- */
+function openPage(kind){
+  current=null;
+  $('#sheetTop').innerHTML=`<button class="ibtn" data-close aria-label="Cerrar">${IC.x}</button><div class="mid">${kind==='summary'?'Nuestro año':'Ajustes'}</div><span style="width:42px"></span>`;
+  $('#sheetBody').innerHTML=kind==='summary'?renderSummary():renderSettings();
+  $('#sheet').dataset.page=kind;$('#sheet').classList.add('show');$('#sheetScroll').scrollTop=0;
+}
+
+/* ---------- acciones ---------- */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button,[data-unblur]');if(!t)return;
+  const ds=t.dataset;
+  if(ds.day){openDay(+ds.day,t);return;}
+  if(ds.go){openPage(ds.go);return;}
+  if('close' in ds){closeSheet();return;}
+  if('prev' in ds&&current>1){navTo(current-1);return;}
+  if('next' in ds&&current<31){navTo(current+1);return;}
+  if(ds.unlock){S.unlock=ds.unlock;save(true);document.querySelectorAll('[data-unlock]').forEach(b=>b.classList.toggle('on',b.dataset.unlock===S.unlock));return;}
+  if(t.id==='wgo'){S.names.a=$('#wa').value.trim();S.names.b=$('#wb').value.trim();S.welcomed=true;save(true);renderHome();return;}
+  if('unblur' in ds){D(current)._shown=true;renderDay(true);return;}
+  if(ds.mode){D(current).mode=ds.mode;save(true);renderDay();return;}
+  if(ds.hide){const st=D(current);st.hide[ds.hide]=!st.hide[ds.hide];save(true);renderDay();return;}
+  if('done' in ds){const st=D(current);st.done=!st.done;save(true);renderDay();if(st.done)toast(current===31?'Fin del Adviento. Feliz año nuevo, vosotros.':'Día '+current+' completado');return;}
+  if('edit' in ds){editDay(current);return;}
+  if('swap' in ds){swapDay(current);return;}
+  if('share' in ds){const c=content(current);copyText(`Día ${current} — ${c.t}\n${c.q}`,'Pregunta copiada para compartir');return;}
+  if('seal' in ds){
+    if(!S.capsule.text.trim()){toast('Escribid algo antes de sellarla');return;}
+    confirmBox('¿Sellamos la cápsula?',`No podréis leerla ni cambiarla hasta el 31 de diciembre de ${S.year+1}.`,'Sellar',()=>{S.capsule.sealed=true;S.capsule.sealedAt=new Date().toISOString();save(true);renderDay();toast('Cápsula sellada hasta el próximo diciembre');});return;}
+  if('early' in ds){confirmBox('¿Abrirla ya?','La gracia es esperar un año… pero es vuestra carta.','Abrir ahora',()=>{S.capsule.openedEarly=true;save(true);renderDay();});return;}
+  if('copyall' in ds){copyText(allText(),'Recuerdos copiados');return;}
+  if('discreto' in ds){S.discreto=!S.discreto;save(true);t.classList.toggle('on',S.discreto);return;}
+  if('backup' in ds){copyText(JSON.stringify(S),'Copia de seguridad copiada. Guárdala en una nota privada.');return;}
+  if('restore' in ds){restore();return;}
+  if('reset' in ds){confirmBox('¿Borrar todo?','Se eliminarán las respuestas, notas, el progreso y la cápsula de este móvil. No se puede deshacer.','Borrar todo',()=>{const keep={names:S.names,year:S.year,unlock:S.unlock,welcomed:true};S=Object.assign(fresh(),keep);save(true);openPage('settings');toast('Todo borrado');},true);return;}
+});
+function navTo(n){
+  if(!isUnlocked(n)){toast(`Esta puerta se abre el ${n} de diciembre`);return;}
+  const first=!D(n).opened;D(n).opened=true;save(true);current=n;renderDay(first);$('#sheetScroll').scrollTop=0;
+}
+document.addEventListener('input',e=>{
+  const t=e.target,ds=t.dataset;
+  if(ds.note&&current){D(current).notes[ds.note]=t.value;save();}
+  else if('capsule' in ds){S.capsule.text=t.value;save();}
+  else if(ds.name){S.names[ds.name]=t.value;save(true);}
+});
+document.addEventListener('change',e=>{
+  if('year' in e.target.dataset){S.year=+e.target.value;save(true);toast('Calendario de '+S.year);}
+});
+
+function editDay(n){
+  const c=content(n);
+  modal(`<h3>Editar día ${n}</h3><p>Cambiad el texto a vuestro gusto.</p>
+   <label class="field"><span>Título</span><input id="et" value="${esc(c.t)}"></label>
+   <label class="field"><span>Pregunta o actividad</span><textarea id="eq">${esc(c.q)}</textarea></label>
+   <label class="field"><span>Categoría</span><select id="ec">${Object.entries(CATS).map(([k,v])=>`<option value="${k}" ${k===c.c?'selected':''}>${v.l}</option>`).join('')}</select></label>
+   <div class="mrow"><button class="secondary" data-c>Cancelar</button><button class="primary" data-ok>Guardar</button></div>
+   ${D(n).custom?'<button class="secondary" data-orig style="margin-top:8px">Volver a la pregunta original</button>':''}`,m=>{
+    m.querySelector('[data-c]').onclick=closeModal;
+    m.querySelector('[data-ok]').onclick=()=>{const t=m.querySelector('#et').value.trim(),q=m.querySelector('#eq').value.trim();if(!t||!q){toast('Falta el título o el texto');return;}
+      D(n).custom={t,q,c:m.querySelector('#ec').value};save(true);closeModal();renderDay();toast('Día '+n+' actualizado');};
+    const o=m.querySelector('[data-orig]');if(o)o.onclick=()=>{D(n).custom=null;save(true);closeModal();renderDay();};
+  });
+}
+function swapDay(n){
+  const c=content(n);const list=BANK[c.c]||BANK.recuerdos;
+  const used=new Set();for(let i=1;i<=31;i++)used.add(content(i).q);
+  const st=D(n);let pick=null;
+  for(let k=0;k<list.length;k++){const cand=list[(st.swapIdx+k)%list.length];if(!used.has(cand[1])){pick=cand;st.swapIdx=(st.swapIdx+k+1)%list.length;break;}}
+  if(!pick){pick=list[st.swapIdx%list.length];st.swapIdx++;}
+  st.custom={t:pick[0],q:pick[1],c:c.c};save(true);renderDay(true);toast('Nueva pregunta de '+CATS[c.c].l.toLowerCase());
+}
+function restore(){
+  modal(`<h3>Restaurar</h3><p>Pega aquí el texto de la copia de seguridad. Sustituirá lo que hay ahora en este móvil.</p>
+   <label class="field"><textarea id="rj" placeholder='{"v":1,…}'></textarea></label>
+   <div class="mrow"><button class="secondary" data-c>Cancelar</button><button class="primary" data-ok>Restaurar</button></div>`,m=>{
+    m.querySelector('[data-c]').onclick=closeModal;
+    m.querySelector('[data-ok]').onclick=()=>{try{const o=JSON.parse(m.querySelector('#rj').value);if(!o||o.v!==1||typeof o.days!=='object')throw 0;S=Object.assign(fresh(),o);save(true);closeModal();openPage('settings');toast('Copia restaurada');}catch(err){toast('Ese texto no es una copia válida');}};
+  });
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#modal').classList.contains('show'))closeModal();else if($('#sheet').classList.contains('show'))closeSheet();}});
+
+renderHome();
+</script>
+</body>
+</html>
