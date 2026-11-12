@@ -196,3 +196,9 @@ do $$ begin
   begin alter publication supabase_realtime add table public.days;    exception when duplicate_object then null; end;
   begin alter publication supabase_realtime add table public.answers; exception when duplicate_object then null; end;
 end $$;
+
+-- ---------- endurecimiento (avisos del linter de Supabase) ----------
+alter function public.gen_code(int) set search_path = public;
+revoke execute on function public.gen_code(int) from public, anon, authenticated;
+revoke execute on function public.is_member(uuid), public.my_slot(uuid), public.both_submitted(uuid,int) from public, anon;
+grant execute on function public.is_member(uuid), public.my_slot(uuid), public.both_submitted(uuid,int) to authenticated;
