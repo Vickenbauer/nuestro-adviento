@@ -202,3 +202,9 @@ alter function public.gen_code(int) set search_path = public;
 revoke execute on function public.gen_code(int) from public, anon, authenticated;
 revoke execute on function public.is_member(uuid), public.my_slot(uuid), public.both_submitted(uuid,int) from public, anon;
 grant execute on function public.is_member(uuid), public.my_slot(uuid), public.both_submitted(uuid,int) to authenticated;
+
+-- ---------- keepalive (lo llama la GitHub Action para que el plan gratuito no pause el proyecto) ----------
+create or replace function public.keepalive() returns timestamptz
+language sql stable security invoker set search_path = public as $$ select now() $$;
+revoke execute on function public.keepalive() from public;
+grant execute on function public.keepalive() to anon, authenticated;

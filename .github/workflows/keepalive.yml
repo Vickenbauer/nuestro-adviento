@@ -15,6 +15,6 @@ jobs:
         run: |
           URL="https://gzwsjmkrwugikdsvedec.supabase.co"
           KEY="sb_publishable_qOHj1EtjWVpt3pi4gH3fmQ_CjvSb7iS"
-          code=$(curl -s -o /dev/null -w "%{http_code}" "$URL/rest/v1/couples?select=id&limit=1" -H "apikey: $KEY")
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$URL/rest/v1/rpc/keepalive" -H "apikey: $KEY" -H "Content-Type: application/json" -d "{}")
           echo "HTTP $code"
           test "$code" = "200"
